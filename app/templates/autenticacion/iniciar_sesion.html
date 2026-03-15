@@ -1,17 +1,64 @@
 {% extends "base.html" %}
-{% block titulo %}Iniciar Sesión — MediCerca{% endblock %}
+
+{% block titulo %}Iniciar sesión{% endblock %}
 
 {% block contenido %}
+<div class="min-h-screen flex items-center justify-center bg-emerald-50 px-4">
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-lg border border-emerald-100 p-8">
+        <h1 class="text-3xl font-bold text-emerald-700 text-center mb-2">
+            Iniciar sesión
+        </h1>
 
-{# TODO (Diego) — FEATURE 6: Formulario de login
-   Centrado en la pantalla, tarjeta blanca con sombra suave.
-   Form: method POST, action url_for('autenticacion.iniciar_sesion')
-   Campos:
-     - correo (type email, name="correo")
-     - contrasena (type password, name="contrasena")
-     - recordarme (type checkbox, name="recordarme")
-   Botón: "Iniciar Sesión"
-   Link abajo: "¿No tenés cuenta? Registrate acá" → autenticacion.registro
-#}
+        <p class="text-gray-500 text-center mb-6">
+            Accedé a tu cuenta de MediCerca
+        </p>
 
+        <form method="POST" action="#" class="space-y-5">
+            <div>
+                <label for="correo" class="block text-sm font-medium text-gray-700 mb-1">
+                    Correo electrónico
+                </label>
+                <input
+                    type="email"
+                    id="correo"
+                    name="correo"
+                    class="w-full rounded-xl border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    placeholder="correo@ejemplo.com"
+                >
+            </div>
+
+            <div>
+                <label for="contrasena" class="block text-sm font-medium text-gray-700 mb-1">
+                    Contraseña
+                </label>
+                <input
+                    type="password"
+                    id="contrasena"
+                    name="contrasena"
+                    class="w-full rounded-xl border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    placeholder="********"
+                >
+            </div>
+
+            <div class="flex items-center gap-2">
+                <input
+                    type="checkbox"
+                    id="recordarme"
+                    name="recordarme"
+                    class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                >
+                <label for="recordarme" class="text-sm text-gray-700">
+                    Recordarme
+                </label>
+            </div>
+
+            <button
+                type="submit"
+                class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl transition"
+            >
+                Entrar
+            </button>
+        </form>
+    </div>
+</div>
 {% endblock %}

@@ -14,13 +14,28 @@ def iniciar_sesion():
     return render_template("autenticacion/iniciar_sesion.html")
 
 
-# TODO (Matheus) — FEATURE 2: Procesar login
-# POST /auth/iniciar-sesion
-# - Leer campos del form: correo, contrasena, recordarme
-# - Buscar usuario por correo: Usuario.query.filter_by(correo=correo).first()
-# - Si existe y verificar_contrasena() es True → login_user(), redirigir a principal.inicio
-# - Si no → flash("Correo o contraseña incorrectos.", "danger")
-# - Soportar parámetro ?next= para redirigir después del login
+@bp_autenticacion.post("/iniciar-sesion")
+def procesar_inicio_sesion():
+    if current_user.is_authenticated:
+        return redirect(url_for("principal.inicio"))
+
+    correo = request.form.get("correo", "").strip()
+    contrasena = request.form.get("contrasena", "")
+    recordarme = request.form.get("recordarme") is not None
+
+    usuario = Usuario.query.filter_by(correo=correo).first()
+
+    if usuario and usuario.verificar_contrasena(contrasena):
+        login_user(usuario, remember=recordarme)
+
+        siguiente = request.args.get("next")
+        if siguiente:
+            return redirect(siguiente)
+
+        return redirect(url_for("principal.inicio"))
+
+    flash("Correo o contraseña incorrectos.", "danger")
+    return redirect(url_for("autenticacion.iniciar_sesion"))
 
 
 # TODO (Matheus) — FEATURE 3: Página de registro
