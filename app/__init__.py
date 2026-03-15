@@ -1,47 +1,40 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-from flask_migrate import Migrate
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
 
 bd = SQLAlchemy()
-gestor_login = LoginManager()
-migrar = Migrate()
+login_manager = LoginManager()
 
 
 def crear_app():
     app = Flask(__name__)
 
-    app.config["SECRET_KEY"] = os.getenv("CLAVE_SECRETA", "clave-dev-cambiar")
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("BASE_DE_DATOS", "sqlite:///medicerca.db")
+    app.config["SECRET_KEY"] = "dev-secret-key"
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///medicerca.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     bd.init_app(app)
-    gestor_login.init_app(app)
-    migrar.init_app(app, bd)
+    login_manager.init_app(app)
+    login_manager.login_view = "autenticacion.iniciar_sesion"
 
-    gestor_login.login_view = "autenticacion.iniciar_sesion"
-    gestor_login.login_message = "Iniciá sesión para continuar."
-    gestor_login.login_message_category = "info"
+    from app.models.models import Usuario
 
-    # --- REGISTRAR BLUEPRINTS ---
-    # TODO: Matheus — from app.rutas.autenticacion import bp_autenticacion
-    #                  app.register_blueprint(bp_autenticacion, url_prefix="/auth")
-
-    # TODO: Mathi   — from app.rutas.medicos import bp_medicos
-    #                  app.register_blueprint(bp_medicos, url_prefix="/medicos")
-    #                  from app.rutas.resenas import bp_resenas
-    #                  app.register_blueprint(bp_resenas, url_prefix="/resenas")
-
-    # TODO: Arturo  — from app.rutas.principal import bp_principal
-    #                  app.register_blueprint(bp_principal)
-    #                  from app.rutas.mapa import bp_mapa
-    #                  app.register_blueprint(bp_mapa, url_prefix="/mapa")
+    @login_manager.user_loader
+    def cargar_usuario(usuario_id):
+        return Usuario.query.get(int(usuario_id))
 
     with app.app_context():
+        from app.models import Usuario, Medico, Resena
         bd.create_all()
+
+    from app.rutas.autenticacion import bp_autenticacion
+    app.register_blueprint(bp_autenticacion)
+
+    # TODO: Arturo — from app.rutas.principal import bp_principal
+    #                 app.register_blueprint(bp_principal)
+    # TODO: Hugo — from app.rutas.busqueda import bp_busqueda
+    #               app.register_blueprint(bp_busqueda)
+    # TODO: Diego — from app.rutas.perfil import bp_perfil
+    #                app.register_blueprint(bp_perfil)
 
     return app
