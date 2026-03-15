@@ -40,56 +40,55 @@ class Usuario(UserMixin, bd.Model):
 
     def __repr__(self):
         return f"<Usuario {self.correo}>"
+    
+# ============================================================
+#  Modelo Medico (tabla: medicos)
+# ============================================================
+class Medico(bd.Model):
+    __tablename__ = "medicos"
 
-# ============================================================
-#  CONTRATO: Modelo Medico (tabla: medicos)
-# ============================================================
-# class Medico(bd.Model):
-#     __tablename__ = "medicos"
-#     id                     — Integer, PK
-#     usuario_id             — Integer, FK → usuarios.id
-#     especialidad           — String(100), not null
-#     numero_matricula       — String(50), unique, not null
-#     hospital               — String(150), nullable
-#     ciudad                 — String(100), nullable
-#     telefono               — String(30), nullable
-#     biografia              — Text, nullable
-#     universidad_graduacion — String(200), nullable
-#     foto                   — String(200), default='medico_default.png'
-#     anios_experiencia      — Integer, default=0
-#     calificacion_promedio  — Float, default=0.0  ← se recalcula al agregar reseñas
-#     total_resenas          — Integer, default=0   ← contador de reseñas
-#     verificado             — Boolean, default=False
-#     creado_en              — DateTime, default=now
-#
-#     # Ubicación para el mapa
-#     latitud                — Float, nullable       ← coordenada lat del doctor
-#     longitud               — Float, nullable       ← coordenada lng del doctor
-#     direccion_consultorio  — String(255), nullable ← dirección legible
-#
-#     # Relaciones
-#     resenas — relationship → Resena (backref='medico')
-#
-# class Medico(bd.Model):
-#     pass  # TODO
+    id                     = bd.Column(bd.Integer, primary_key=True)
+    usuario_id             = bd.Column(bd.Integer, bd.ForeignKey("usuarios.id"), nullable=False)
+    especialidad           = bd.Column(bd.String(100), nullable=False)
+    numero_matricula       = bd.Column(bd.String(50), unique=True, nullable=False)
+    hospital               = bd.Column(bd.String(150), nullable=True)
+    ciudad                 = bd.Column(bd.String(100), nullable=True)
+    telefono               = bd.Column(bd.String(30), nullable=True)
+    biografia              = bd.Column(bd.Text, nullable=True)
+    universidad_graduacion = bd.Column(bd.String(200), nullable=True)
+    foto                   = bd.Column(bd.String(200), default='medico_default.png')
+    anios_experiencia      = bd.Column(bd.Integer, default=0)
+    calificacion_promedio  = bd.Column(bd.Float, default=0.0)
+    total_resenas          = bd.Column(bd.Integer, default=0)
+    verificado             = bd.Column(bd.Boolean, default=False)
+    creado_en              = bd.Column(bd.DateTime, default=datetime.utcnow)
 
+    # Ubicación
+    latitud                = bd.Column(bd.Float, nullable=True)
+    longitud               = bd.Column(bd.Float, nullable=True)
+    direccion_consultorio  = bd.Column(bd.String(255), nullable=True)
 
+    # Relaciones
+    resenas                = bd.relationship("Resena", backref="medico", lazy=True)
+
+    def __repr__(self):
+        return f"<Medico {self.especialidad} — matrícula {self.numero_matricula}>"
 # ============================================================
-#  CONTRATO: Modelo Resena (tabla: resenas)
+#  Modelo Resena (tabla: resenas)
 # ============================================================
-# Una reseña pertenece a un Usuario (autor) y a un Medico
-#
-# class Resena(bd.Model):
-#     __tablename__ = "resenas"
-#     id          — Integer, PK
-#     medico_id   — Integer, FK → medicos.id, not null
-#     usuario_id  — Integer, FK → usuarios.id, not null
-#     puntuacion  — Integer, not null  ← valor entre 1 y 5
-#     comentario  — Text, nullable
-#     creado_en   — DateTime, default=now
-#
-#     # Restricción: un usuario solo puede reseñar una vez al mismo médico
-#     __table_args__ = (UniqueConstraint('medico_id', 'usuario_id'),)
-#
-# class Resena(bd.Model):
-#     pass  # TODO
+class Resena(bd.Model):
+    __tablename__ = "resenas"
+
+    id         = bd.Column(bd.Integer, primary_key=True)
+    medico_id  = bd.Column(bd.Integer, bd.ForeignKey("medicos.id"), nullable=False)
+    usuario_id = bd.Column(bd.Integer, bd.ForeignKey("usuarios.id"), nullable=False)
+    puntuacion = bd.Column(bd.Integer, nullable=False)  # 1–5
+    comentario = bd.Column(bd.Text, nullable=True)
+    creado_en  = bd.Column(bd.DateTime, default=datetime.utcnow)
+
+    __table_args__ = (
+        UniqueConstraint('medico_id', 'usuario_id', name='uq_resena_usuario_medico'),
+    )
+
+    def __repr__(self):
+        return f"<Resena puntuacion={self.puntuacion} medico_id={self.medico_id}>"
