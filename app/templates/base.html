@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block titulo %}MediCerca{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+  {% block cabecera_extra %}{% endblock %}
+</head>
+<body>
+
+  <!-- DIEGO: NAVBAR aquí -->
+  <!-- Links del navbar:
+       - 🩺 MediCerca (logo, link a principal.inicio)
+       - Médicos → url_for('medicos.lista_medicos')
+       - Mapa    → url_for('mapa.mapa_medicos')       ← NUEVO
+       Si logueado:
+       - Mi Panel → url_for('principal.panel')
+       - Salir    → url_for('autenticacion.cerrar_sesion')
+       Si no logueado:
+       - Iniciar Sesión → url_for('autenticacion.iniciar_sesion')
+       - Registrarse    → url_for('autenticacion.registro')
+  -->
+
+
+  <!-- DIEGO: FLASH MESSAGES aquí -->
+  {# Tip: usar get_flashed_messages(with_categories=true) #}
+
+
+  <main>
+    {% block contenido %}{% endblock %}
+  </main>
+
+
+  <!-- DIEGO: FOOTER aquí -->
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block pie_extra %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block titulo %}<!-- MATHI+DIEGO: nombre del médico -->{% endblock %}
+
+{% block contenido %}
+<!-- MATHI + DIEGO: contenido del perfil médico -->
+
+<!-- Estructura sugerida:
+
+  === SECCIÓN SUPERIOR: datos del médico ===
+  - Foto, nombre (medico.usuario.nombre), especialidad
+  - Badge "✓ Verificado" si medico.verificado
+  - Matrícula, hospital, ciudad, teléfono
+  - Universidad de graduación 🎓
+  - Años de experiencia
+  - Botón "Editar" si es el dueño
+  - Botón "Ver en mapa" si medico.latitud → url_for('mapa.mapa_medicos') + anchor al marcador
+  - Dirección del consultorio si medico.direccion_consultorio
+
+  === SECCIÓN RATING ===
+  - Estrellas promedio: medico.calificacion_promedio (★★★★☆)
+  - Total de reseñas: medico.total_resenas
+
+  === SECCIÓN RESEÑAS ===
+  - Formulario de nueva reseña (solo si current_user.is_authenticated
+    y el usuario NO es el propio médico
+    y el usuario NO reseñó antes)
+    → POST a url_for('resenas.agregar_resena', medico_id=medico.id)
+    → Campos: puntuacion (1-5 estrellas), comentario
+
+  - Lista de reseñas existentes:
+    {% for resena in medico.resenas %}
+      - Nombre del autor: resena.autor.nombre
+      - Puntuación: resena.puntuacion estrellas
+      - Comentario: resena.comentario
+      - Fecha: resena.creado_en
+      - Botón editar/eliminar si resena.usuario_id == current_user.id
+    {% endfor %}
+-->
+
+{% endblock %}

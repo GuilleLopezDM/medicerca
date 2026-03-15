@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block titulo %}MediCerca — Encontrá tu médico{% endblock %}
+
+{% block contenido %}
+
+{# TODO (Diego) — FEATURE 3: Sección Hero
+   - Fondo degradado verde esmeralda
+   - Título grande: "Encontrá tu médico de confianza"
+   - Subtítulo descriptivo
+   - Formulario de búsqueda que apunta a: url_for('medicos.lista_medicos') method GET
+     con un input name="busqueda" y botón de buscar
+#}
+
+
+{# TODO (Diego) — FEATURE 4: Sección de estadísticas
+   - 3 columnas: total_medicos registrados / +20 especialidades / 100% verificados
+   - Usar la variable {{ total_medicos }} que viene desde principal.inicio
+#}
+
+
+{# TODO (Diego) — FEATURE 5: Grilla de médicos recientes
+   - Título "Médicos recientes"
+   - Loop: {% for medico in medicos_recientes %}
+   - Cada card muestra: medico.usuario.nombre, medico.especialidad,
+     medico.hospital, medico.ciudad, medico.universidad_graduacion, medico.anios_experiencia
+   - La card linkea a: url_for('medicos.detalle_medico', medico_id=medico.id)
+   - Si no hay médicos: mostrar mensaje "Aún no hay médicos registrados."
+   - Botón al final: "Ver todos los médicos →" → url_for('medicos.lista_medicos')
+#}
+
+{% endblock %}

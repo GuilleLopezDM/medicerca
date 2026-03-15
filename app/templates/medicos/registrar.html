@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block titulo %}Registrar Perfil Médico — MediCerca{% endblock %}
+
+{% block contenido %}
+
+{# TODO (Diego) — FEATURE 10: Formulario de alta médica
+   Título: "Registrar Perfil Médico"
+   Form: method POST, action url_for('medicos.registrar_medico')
+
+   Campos (grilla 2 columnas):
+     - especialidad (text, requerido)
+     - numero_matricula (text, requerido)
+     - hospital (text)
+     - ciudad (text)
+     - telefono (text)
+     - anios_experiencia (number, min 0)
+     - universidad_graduacion (text, col-span-2)
+   Área de texto:
+     - biografia (textarea, 4 filas)
+   Botón: "Guardar perfil"
+#}
+
+{% endblock %}

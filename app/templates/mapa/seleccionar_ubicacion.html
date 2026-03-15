@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block titulo %}Seleccionar Ubicación — MediCerca{% endblock %}
+
+{% block cabecera_extra %}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+{% endblock %}
+
+{% block contenido %}
+<!-- DIEGO + ARTURO: formulario para que el médico ubique su consultorio -->
+
+<!-- Estructura sugerida:
+  1. Instrucciones: "Hacé click en el mapa para marcar tu consultorio"
+  2. Div del mapa con id="mapa-selector"
+  3. Inputs hidden: latitud, longitud (se llenan con JS al clickear)
+  4. Input de texto: direccion_consultorio
+  5. Botón guardar → POST /mapa/guardar-ubicacion
+-->
+
+{% endblock %}
+
+{% block pie_extra %}
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    // ARTURO: mapa interactivo para seleccionar ubicación
+    // Al click → actualizar inputs hidden latitud/longitud
+    // TODO
+  </script>
+{% endblock %}

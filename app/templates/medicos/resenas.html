@@ -1,0 +1,20 @@
+{# ARTURO: este template se incluye dentro de medicos/detalle.html
+   Uso: {% include 'medicos/resenas.html' %}
+   Espera la variable: medico #}
+
+<!-- SECCIÓN DE RATING -->
+<!-- TODO: Mostrar calificación promedio con estrellas (medico.calificacion) -->
+<!-- Ejemplo visual: ⭐⭐⭐⭐☆ 4.0 (12 reseñas) -->
+
+<!-- FORMULARIO PARA DEJAR RESEÑA -->
+<!-- Solo visible si current_user.is_authenticated -->
+<!-- TODO: form con POST a /resenas/crear/{{ medico.id }} -->
+<!-- Campos: puntuacion (5 radio buttons o estrellas clickeables), comentario (textarea) -->
+
+<!-- LISTA DE RESEÑAS EXISTENTES -->
+<!-- TODO: iterar medico.resenas, mostrar: -->
+<!--   - nombre del autor (resena.autor.nombre) -->
+<!--   - puntuacion en estrellas -->
+<!--   - comentario -->
+<!--   - fecha (resena.creado_en) -->
+<!--   - botón eliminar si current_user.id == resena.autor_id o admin -->

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block titulo %}Mapa de Médicos — MediCerca{% endblock %}
+
+{% block cabecera_extra %}
+  <!-- DIEGO: Leaflet.js CSS — NO borrar -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+{% endblock %}
+
+{% block contenido %}
+<!-- DIEGO + ARTURO: contenido del mapa aquí -->
+
+<!-- Estructura sugerida:
+  1. Título + descripción
+  2. Div del mapa con id="mapa" (altura fija, ej: h-[600px])
+  3. Script de Leaflet que consume /mapa/medicos.json
+     y coloca un marcador por cada médico con coordenadas
+  4. Popup del marcador (preview del médico):
+     - Nombre, especialidad, hospital
+     - Estrellas de calificacion_promedio
+     - Botón "Ver perfil" → url_for('medicos.detalle_medico', medico_id=id)
+-->
+
+{% endblock %}
+
+{% block pie_extra %}
+  <!-- DIEGO: Leaflet.js JS — NO borrar -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+    // ARTURO: inicializar el mapa y cargar los médicos
+    // TODO: fetch('/mapa/medicos.json') → colocar marcadores
+  </script>
+{% endblock %}

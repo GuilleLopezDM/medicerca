@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block titulo %}Mapa de Médicos — MediCerca{% endblock %}
+
+{% block cabecera_extra %}
+<!-- ARTURO/MATHI: Leaflet.js — librería de mapas gratuita, sin API key -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+{% endblock %}
+
+{% block contenido %}
+<!-- TODO: Agregar mapa con marcadores de médicos -->
+<!-- Tip: Pasar los médicos como JSON al JavaScript con:
+     var medicos = {{ medicos | tojson }};
+     Pero primero necesitás serializar los datos en la ruta -->
+{% endblock %}

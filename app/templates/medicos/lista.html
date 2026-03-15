@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block titulo %}Médicos — MediCerca{% endblock %}
+
+{% block contenido %}
+
+{# TODO (Diego) — FEATURE 8: Directorio de médicos con filtros
+   Título: "Directorio de Médicos"
+
+   Formulario de filtros (method GET):
+     - busqueda: input text, name="busqueda", valor actual: {{ filtros_actuales.busqueda }}
+     - especialidad: select, name="especialidad", opciones desde {{ especialidades }}
+     - ciudad: select, name="ciudad", opciones desde {{ ciudades }}
+     - universidad: select, name="universidad", opciones desde {{ universidades }}
+     - verificados: checkbox, name="verificados", value="1"
+     - Botón "Filtrar"
+   Los selects deben pre-seleccionar el valor actual usando filtros_actuales.
+
+   Contador: "{{ total }} resultado(s) encontrado(s)"
+
+   Grilla de cards (loop: {% for medico in medicos %}):
+     Cada card muestra:
+       - medico.usuario.nombre
+       - medico.especialidad
+       - medico.numero_matricula
+       - medico.hospital (si existe)
+       - medico.ciudad (si existe)
+       - medico.universidad_graduacion (si existe, con 🎓)
+       - Badge "✓ Verificado" si medico.verificado es True
+     La card linkea a: url_for('medicos.detalle_medico', medico_id=medico.id)
+
+   Si no hay médicos: mostrar mensaje con ícono 🔍
+#}
+
+{% endblock %}

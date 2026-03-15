@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block titulo %}Editar Perfil — MediCerca{% endblock %}
+
+{% block contenido %}
+
+{# TODO (Diego) — FEATURE 11: Formulario de edición
+   Igual al de registrar pero con los valores actuales pre-cargados.
+   Form: method POST, action url_for('medicos.editar_medico', medico_id=medico.id)
+
+   Campos editables (pre-cargar con medico.campo):
+     - especialidad, hospital, ciudad, telefono, anios_experiencia
+     - universidad_graduacion
+     - biografia (textarea)
+
+   Campo NO editable (disabled):
+     - numero_matricula → mostrar con fondo gris y nota "La matrícula no puede modificarse."
+
+   Botones:
+     - "Guardar cambios" (submit)
+     - "Cancelar" → link a medicos.detalle_medico
+#}
+
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block titulo %}Dejar Reseña — MediCerca{% endblock %}
+
+{% block contenido %}
+<!-- DIEGO + MATHI: formulario de reseña -->
+
+<!-- Estructura sugerida:
+  1. Título: "Reseña para Dr. {{ medico.usuario.nombre }}"
+  2. Selector de puntuación 1-5 estrellas (con JS o radio buttons)
+  3. Textarea para comentario (opcional)
+  4. Botón enviar → POST /resenas/agregar/<medico_id>
+  5. Solo visible si el usuario está logueado y no reseñó antes
+-->
+
+{% endblock %}

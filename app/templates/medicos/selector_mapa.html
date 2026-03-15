@@ -1,0 +1,47 @@
+{# DIEGO + MARCELO: selector de ubicación para el perfil del médico
+   Incluir en medicos/registrar.html y medicos/editar.html
+   Uso: {% include 'medicos/selector_mapa.html' %}
+   El médico hace clic en el mapa para fijar su ubicación #}
+
+<!-- MARCELO: Leaflet para selector de ubicación -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<label class="block text-sm font-medium text-slate-700 mb-1">
+  Ubicación en el mapa
+</label>
+<p class="text-xs text-slate-400 mb-2">
+  Hacé clic en el mapa para marcar la ubicación de tu consultorio.
+</p>
+
+<!-- Contenedor del mapa selector -->
+<div id="selector-mapa" style="height: 300px; width: 100%;" class="rounded-xl border border-slate-200 mb-3">
+  <!-- Mapa Leaflet aquí -->
+</div>
+
+<!-- Campos ocultos que se llenan automáticamente al hacer clic en el mapa -->
+<input type="hidden" name="latitud" id="campo-latitud" value="{{ medico.latitud if medico else '' }}">
+<input type="hidden" name="longitud" id="campo-longitud" value="{{ medico.longitud if medico else '' }}">
+
+<!-- Campo de dirección visible -->
+<input type="text" name="direccion_completa" id="campo-direccion"
+  value="{{ medico.direccion_completa if medico else '' }}"
+  placeholder="Dirección del consultorio (se autocompleta al hacer clic)"
+  class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500"/>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  // TODO: Inicializar mapa selector centrado en Paraguay
+  // const selectorMapa = L.map('selector-mapa').setView([-25.2867, -57.647], 12);
+
+  // TODO: Agregar tiles OpenStreetMap
+
+  // TODO: Si ya hay coordenadas (modo edición), mostrar marcador existente
+  // const latExistente = document.getElementById('campo-latitud').value;
+  // const lngExistente = document.getElementById('campo-longitud').value;
+
+  // TODO: Al hacer clic en el mapa:
+  //   1. Poner un marcador en esa posición
+  //   2. Llenar campo-latitud y campo-longitud
+  //   3. Usar Nominatim (OpenStreetMap) para reverse geocoding y llenar campo-direccion
+  //   API gratuita: https://nominatim.openstreetmap.org/reverse?lat=X&lon=Y&format=json
+</script>

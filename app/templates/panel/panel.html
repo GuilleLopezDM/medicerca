@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block titulo %}Mi Panel — MediCerca{% endblock %}
+
+{% block contenido %}
+
+{# TODO (Diego) — FEATURE 12: Panel del usuario
+   Saludo: "Bienvenido, {{ current_user.nombre }}"
+
+   Si current_user.rol == 'medico':
+     Si current_user.perfil_medico existe:
+       - Tarjeta con especialidad, botones "Ver perfil" y "Editar"
+     Si NO tiene perfil:
+       - Tarjeta destacada: "¡Creá tu perfil médico!"
+       - Botón → medicos.registrar_medico
+
+   Tarjeta siempre visible:
+     - "Directorio" con botón → medicos.lista_medicos
+#}
+
+{% endblock %}
