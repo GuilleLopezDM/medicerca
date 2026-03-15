@@ -3,12 +3,15 @@ from flask_login import login_user, logout_user, login_required, current_user
 from app import bd
 from app.models import Usuario
 
-bp_autenticacion = Blueprint("autenticacion", __name__)
+bp_autenticacion = Blueprint("autenticacion", __name__, url_prefix="/auth")
 
 
-# TODO (Matheus) — FEATURE 1: Página de login
-# GET /auth/iniciar-sesion → mostrar template "autenticacion/iniciar_sesion.html"
-# Si el usuario ya está autenticado → redirigir a principal.inicio
+@bp_autenticacion.get("/iniciar-sesion")
+def iniciar_sesion():
+    if current_user.is_authenticated:
+        return redirect(url_for("principal.inicio"))
+
+    return render_template("autenticacion/iniciar_sesion.html")
 
 
 # TODO (Matheus) — FEATURE 2: Procesar login
