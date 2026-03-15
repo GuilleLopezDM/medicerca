@@ -7,36 +7,39 @@ from app import bd, gestor_login
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+from sqlalchemy import UniqueConstraint
 
 
 # --- HUGO: user_loader ---
-# @gestor_login.user_loader
-# def cargar_usuario(usuario_id):
-#     pass  # TODO
-
+@gestor_login.user_loader
+def cargar_usuario(usuario_id):
+    return Usuario.query.get(int(usuario_id))
 
 # ============================================================
-#  CONTRATO: Modelo Usuario (tabla: usuarios)
+#  Modelo Usuario (tabla: usuarios)
 # ============================================================
-# class Usuario(UserMixin, bd.Model):
-#     __tablename__ = "usuarios"
-#     id            — Integer, PK
-#     nombre        — String(100), not null
-#     correo        — String(120), unique, not null
-#     contrasena_hash — String(256), not null
-#     rol           — String(20), default='paciente'
-#     creado_en     — DateTime, default=now
-#
-#     # Relaciones
-#     perfil_medico — relationship → Medico (uselist=False)
-#     resenas       — relationship → Resena (backref='autor')
-#
-#     def establecer_contrasena(self, contrasena): ...
-#     def verificar_contrasena(self, contrasena): ...
-#
-# class Usuario(UserMixin, bd.Model):
-#     pass  # TODO
+class Usuario(UserMixin, bd.Model):
+    __tablename__ = "usuarios"
 
+    id              = bd.Column(bd.Integer, primary_key=True)
+    nombre          = bd.Column(bd.String(100), nullable=False)
+    correo          = bd.Column(bd.String(120), unique=True, nullable=False)
+    contrasena_hash = bd.Column(bd.String(256), nullable=False)
+    rol             = bd.Column(bd.String(20), default='paciente')
+    creado_en       = bd.Column(bd.DateTime, default=datetime.utcnow)
+
+    # Relaciones
+    perfil_medico   = bd.relationship("Medico", backref="usuario", uselist=False)
+    resenas         = bd.relationship("Resena", backref="autor", lazy=True)
+
+    def establecer_contrasena(self, contrasena):
+        self.contrasena_hash = generate_password_hash(contrasena)
+
+    def verificar_contrasena(self, contrasena):
+        return check_password_hash(self.contrasena_hash, contrasena)
+
+    def __repr__(self):
+        return f"<Usuario {self.correo}>"
 
 # ============================================================
 #  CONTRATO: Modelo Medico (tabla: medicos)
