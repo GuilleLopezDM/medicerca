@@ -80,8 +80,10 @@ def procesar_registro():
     return redirect(url_for("autenticacion.iniciar_sesion"))
 
 
-# TODO (Matheus) — FEATURE 5: Cerrar sesión
-# GET /auth/cerrar-sesion → requiere @login_required
-# - logout_user()
-# - flash("Sesión cerrada.", "info")
-# - redirigir a principal.inicio
+# logout
+@bp_autenticacion.get("/cerrar-sesion")
+@login_required
+def cerrar_sesion():
+    logout_user()
+    flash("Sesión cerrada.", "info")
+    return redirect(url_for("principal.inicio"))
