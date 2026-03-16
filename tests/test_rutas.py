@@ -38,4 +38,13 @@ def app():
 def cliente(app):
     """Cliente de pruebas HTTP."""
     return app.test_client()
+
+def registrar_usuario_de_prueba(cliente, correo="test@mail.com", password="test1234"):
+    """Registra un usuario paciente y devuelve la respuesta."""
+    return cliente.post("/auth/registro", data={
+        "nombre": "Usuario Test",
+        "correo": correo,
+        "contrasena": password,
+        "rol": "paciente",
+    }, follow_redirects=False)
 # Tu código acá
