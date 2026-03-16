@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 
 bd = SQLAlchemy()
-login_manager = LoginManager()
+gestor_login = LoginManager()
 
 
 def crear_app():
@@ -14,22 +14,21 @@ def crear_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     bd.init_app(app)
-    login_manager.init_app(app)
-    login_manager.login_view = "autenticacion.iniciar_sesion"
+    gestor_login.init_app(app)
+    gestor_login.login_view = "autenticacion.iniciar_sesion"
 
     from app.models.models import Usuario
 
-    @login_manager.user_loader
+    @gestor_login.user_loader
     def cargar_usuario(usuario_id):
         return Usuario.query.get(int(usuario_id))
 
     with app.app_context():
-        from app.models import Usuario, Medico, Resena
+        from app.models.models import Usuario, Medico, Resena
         bd.create_all()
 
     from app.rutas.autenticacion import bp_autenticacion
     app.register_blueprint(bp_autenticacion)
-
     # TODO: Arturo — from app.rutas.principal import bp_principal
     #                 app.register_blueprint(bp_principal)
     # TODO: Hugo — from app.rutas.busqueda import bp_busqueda
