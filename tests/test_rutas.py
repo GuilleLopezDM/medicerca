@@ -17,4 +17,25 @@
 import pytest
 from app import crear_app, bd
 
+@pytest.fixture()
+def app():
+    """App configurada con base de datos en memoria para tests."""
+    app = crear_app({
+        "TESTING": True,
+        "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
+        "WTF_CSRF_ENABLED": False,          # deshabilita CSRF si usas Flask-WTF
+        "SECRET_KEY": "clave-test-segura",
+    })
+
+    with app.app_context():
+        _bd.create_all()
+        yield app
+        _bd.session.remove()
+        _bd.drop_all()
+
+
+@pytest.fixture()
+def cliente(app):
+    """Cliente de pruebas HTTP."""
+    return app.test_client()
 # Tu código acá
