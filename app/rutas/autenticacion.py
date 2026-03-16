@@ -49,13 +49,35 @@ def registro():
     return render_template("autenticacion/registro.html")
 
 
-# TODO (Matheus) — FEATURE 4: Procesar registro
-# POST /auth/registro
-# - Leer campos: nombre, correo, contrasena, rol
-# - Verificar que el correo no exista: Usuario.query.filter_by(correo=correo).first()
-# - Si existe → flash("Ya existe una cuenta con ese correo.", "danger")
-# - Si no → crear Usuario, llamar establecer_contrasena(), bd.session.add(), bd.session.commit()
-# - flash("Cuenta creada exitosamente.", "success") → redirigir a autenticacion.iniciar_sesion
+# procesar registro
+@bp_autenticacion.post("/registro")
+def procesar_registro():
+    if current_user.is_authenticated:
+        return redirect(url_for("principal.inicio"))
+
+    nombre = request.form.get("nombre", "").strip()
+    correo = request.form.get("correo", "").strip()
+    contrasena = request.form.get("contrasena", "")
+    rol = request.form.get("rol", "").strip()
+
+    usuario_existente = Usuario.query.filter_by(correo=correo).first()
+
+    if usuario_existente:
+        flash("Ya existe una cuenta con ese correo.", "danger")
+        return redirect(url_for("autenticacion.registro"))
+
+    nuevo_usuario = Usuario(
+        nombre=nombre,
+        correo=correo,
+        rol=rol
+    )
+    nuevo_usuario.establecer_contrasena(contrasena)
+
+    bd.session.add(nuevo_usuario)
+    bd.session.commit()
+
+    flash("Cuenta creada exitosamente.", "success")
+    return redirect(url_for("autenticacion.iniciar_sesion"))
 
 
 # TODO (Matheus) — FEATURE 5: Cerrar sesión
