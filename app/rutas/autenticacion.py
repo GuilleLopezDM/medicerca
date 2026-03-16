@@ -1,11 +1,12 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
 from app import bd
-from app.models.models import Usuario
+from app.models import Usuario
 
 bp_autenticacion = Blueprint("autenticacion", __name__, url_prefix="/auth")
 
 
+# pagina de login
 @bp_autenticacion.get("/iniciar-sesion")
 def iniciar_sesion():
     if current_user.is_authenticated:
@@ -14,6 +15,7 @@ def iniciar_sesion():
     return render_template("autenticacion/iniciar_sesion.html")
 
 
+# procesar login
 @bp_autenticacion.post("/iniciar-sesion")
 def procesar_inicio_sesion():
     if current_user.is_authenticated:
@@ -38,9 +40,13 @@ def procesar_inicio_sesion():
     return redirect(url_for("autenticacion.iniciar_sesion"))
 
 
-# TODO (Matheus) — FEATURE 3: Página de registro
-# GET /auth/registro → mostrar template "autenticacion/registro.html"
-# Si el usuario ya está autenticado → redirigir a principal.inicio
+# pagina de registro
+@bp_autenticacion.get("/registro")
+def registro():
+    if current_user.is_authenticated:
+        return redirect(url_for("principal.inicio"))
+
+    return render_template("autenticacion/registro.html")
 
 
 # TODO (Matheus) — FEATURE 4: Procesar registro
