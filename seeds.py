@@ -23,4 +23,51 @@ from app.models import Usuario, Medico
 app = crear_app()
 
 with app.app_context():
+    def crear_usuario_si_no_existe(nombre, correo, rol):
+    usuario = Usuario.query.filter_by(correo=correo).first()
+
+    if usuario:
+        return usuario
+
+    usuario = Usuario(
+        nombre=nombre,
+        correo=correo,
+        rol=rol
+    )
+
+    usuario.establecer_contrasena("test1234")
+
+    bd.session.add(usuario)
+    bd.session.commit()
+
+    return usuario
+
+
+def crear_medico_si_no_existe(usuario, especialidad, matricula, hospital,
+                              ciudad, telefono, biografia, universidad,
+                              experiencia, verificado):
+
+    medico = Medico.query.filter_by(usuario_id=usuario.id).first()
+
+    if medico:
+        return medico
+
+    medico = Medico(
+        usuario_id=usuario.id,
+        especialidad=especialidad,
+        numero_matricula=matricula,
+        hospital=hospital,
+        ciudad=ciudad,
+        telefono=telefono,
+        biografia=biografia,
+        universidad_graduacion=universidad,
+        anios_experiencia=experiencia,
+        verificado=verificado
+    )
+
+    bd.session.add(medico)
+    bd.session.commit()
+
+    return medico
+
     pass  # Tu código acá
