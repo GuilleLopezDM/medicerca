@@ -89,38 +89,41 @@ def registrar():
 
 
 # TODO (Mathi) — FEATURE 4: Guardar perfil médico
-# POST /medicos/registrar → requiere @login_required
-# - Leer campos: especialidad, numero_matricula, hospital, ciudad, telefono,
-#                biografia, universidad_graduacion, anios_experiencia
-# - Crear Medico con usuario_id=current_user.id
-# - bd.session.add(), bd.session.commit()
-# - flash("Perfil médico creado.", "success") → redirigir a detalle
+
+
 
 
 # TODO (Mathi) — FEATURE 5: Formulario de edición
-# GET /medicos/editar/<int:medico_id> → requiere @login_required
-# - Solo el dueño (medico.usuario_id == current_user.id) o rol admin puede editar
-# - Si no tiene permiso → flash danger, redirigir al detalle
-# - Template: "medicos/editar.html"
+@bp_medicos.route("/editar/<int:medico_id>", methods=["GET", "POST"])
+@login_required
+def editar(medico_id):
+    medico = Medico.query.get_or_404(medico_id)
 
+    # Seguridad: Solo dueño o Admin
+    if medico.usuario_id != current_user.id and current_user.rol != 'admin':
+        flash("No tienes permiso para editar este perfil.", "danger")
+        return redirect(url_for('medicos.detalle', medico_id=medico.id))
+
+    if request.method == "POST":
+        medico.especialidad = request.form.get('especialidad')
+        medico.hospital = request.form.get('hospital')
+        medico.ciudad = request.form.get('ciudad')
+        medico.telefono = request.form.get('telefono')
+        medico.biografia = request.form.get('biografia')
+        medico.universidad_graduacion = request.form.get('universidad_graduacion')
+        medico.anios_experiencia = request.form.get('anios_experiencia', type=int)
+        medico.numero_matricula = request.form.get('Numero de Matricula')
+        
+        
+        bd.session.commit()
+        flash("Perfil actualizado correctamente.", "success")
+        return redirect(url_for('medicos.detalle', medico_id=medico.id))
+
+    return render_template("medicos/editar.html", medico=medico)
 
 # TODO (Mathi) — FEATURE 6: Guardar edición
-# POST /medicos/editar/<int:medico_id> → requiere @login_required
-# - Campos editables: especialidad, hospital, ciudad, telefono, biografia,
-#                     universidad_graduacion, anios_experiencia
-# - numero_matricula NO se edita
-# - bd.session.commit()
-# - flash("Perfil actualizado.", "success") → redirigir al detalle
+
 
 
 # --- FEATURE 5: MAPA DE MÉDICOS ---
-# GET /medicos/mapa → mapa interactivo con todos los médicos geolocalizados
-# Solo muestra médicos que tengan latitud y longitud cargados
-# @bp_medicos.route("/mapa")
-# def mapa_medicos():
-#     # medicos_geolocalizados = Medico.query.filter(
-#     #     Medico.latitud != None,
-#     #     Medico.longitud != None
-#     # ).join(Usuario).all()
-#     # return render_template("medicos/mapa.html", medicos=medicos_geolocalizados)
-#     pass  # TODO
+
