@@ -24,23 +24,23 @@ app = crear_app()
 
 with app.app_context():
     def crear_usuario_si_no_existe(nombre, correo, rol):
-    usuario = Usuario.query.filter_by(correo=correo).first()
+        usuario = Usuario.query.filter_by(correo=correo).first()
 
-    if usuario:
+        if usuario:
+            return usuario
+
+        usuario = Usuario(
+            nombre=nombre,
+            correo=correo,
+            rol=rol
+        )
+
+        usuario.establecer_contrasena("test1234")
+
+        bd.session.add(usuario)
+        bd.session.commit()
+
         return usuario
-
-    usuario = Usuario(
-        nombre=nombre,
-        correo=correo,
-        rol=rol
-    )
-
-    usuario.establecer_contrasena("test1234")
-
-    bd.session.add(usuario)
-    bd.session.commit()
-
-    return usuario
 
 
 def crear_medico_si_no_existe(usuario, especialidad, matricula, hospital,
@@ -70,4 +70,119 @@ def crear_medico_si_no_existe(usuario, especialidad, matricula, hospital,
 
     return medico
 
-    pass  # Tu código acá
+with app.app_context():
+
+    print("Creando usuarios de prueba...")
+
+    # Pacientes
+    crear_usuario_si_no_existe(
+        "Ana Gómez",
+        "ana@medicerca.com",
+        "paciente"
+    )
+
+    crear_usuario_si_no_existe(
+        "Carlos López",
+        "carlos@medicerca.com",
+        "paciente"
+    )
+
+    # Médicos
+    medico1 = crear_usuario_si_no_existe(
+        "Dr. Juan Martínez",
+        "juan.martinez@medicerca.com",
+        "medico"
+    )
+
+    medico2 = crear_usuario_si_no_existe(
+        "Dra. María Fernández",
+        "maria.fernandez@medicerca.com",
+        "medico"
+    )
+
+    medico3 = crear_usuario_si_no_existe(
+        "Dr. Luis Ramírez",
+        "luis.ramirez@medicerca.com",
+        "medico"
+    )
+
+    medico4 = crear_usuario_si_no_existe(
+        "Dra. Sofía Benítez",
+        "sofia.benitez@medicerca.com",
+        "medico"
+    )
+
+    medico5 = crear_usuario_si_no_existe(
+        "Dr. Pedro González",
+        "pedro.gonzalez@medicerca.com",
+        "medico"
+    )
+
+    print("Creando perfiles médicos...")
+
+    crear_medico_si_no_existe(
+        medico1,
+        "Cardiología",
+        "MAT-1001",
+        "Hospital de Clínicas",
+        "Asunción",
+        "0981123456",
+        "Especialista en enfermedades cardiovasculares con amplia experiencia clínica.",
+        "UNA",
+        15,
+        True
+    )
+
+    crear_medico_si_no_existe(
+        medico2,
+        "Pediatría",
+        "MAT-1002",
+        "Hospital Regional de Encarnación",
+        "Encarnación",
+        "0982123456",
+        "Pediatra enfocada en el cuidado integral de niños y adolescentes.",
+        "UCA",
+        10,
+        True
+    )
+
+    crear_medico_si_no_existe(
+        medico3,
+        "Dermatología",
+        "MAT-1003",
+        "Hospital Regional",
+        "Ciudad del Este",
+        "0983123456",
+        "Dermatólogo especializado en enfermedades de la piel y tratamientos estéticos.",
+        "UNINORTE",
+        8,
+        False
+    )
+
+    crear_medico_si_no_existe(
+        medico4,
+        "Neurología",
+        "MAT-1004",
+        "Hospital General",
+        "San Lorenzo",
+        "0984123456",
+        "Neuróloga dedicada al diagnóstico y tratamiento de trastornos neurológicos.",
+        "UA",
+        12,
+        True
+    )
+
+    crear_medico_si_no_existe(
+        medico5,
+        "Traumatología",
+        "MAT-1005",
+        "Hospital Distrital",
+        "Luque",
+        "0985123456",
+        "Traumatólogo especializado en lesiones deportivas y cirugía ortopédica.",
+        "UAA",
+        9,
+        False
+    )
+
+    print("Seeds completados correctamente.") # Tu código acá
