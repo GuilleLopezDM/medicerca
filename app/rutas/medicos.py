@@ -18,18 +18,25 @@ def lista_medicos():
     verificados = request.args.get('verificados')
 
     # Aplicación de lógica de filtros (ILIKE para ignorar mayúsculas)
+
+    # Feature 1 — Búsqueda general
     if busqueda:
         query = query.filter(
             (Usuario.nombre.ilike(f"%{busqueda}%")) | 
             (Medico.especialidad.ilike(f"%{busqueda}%")) | 
             (Medico.hospital.ilike(f"%{busqueda}%"))
         )
+
+    # Feature 2 (Marcelo)— Filtro por especialidad
     if especialidad:
         query = query.filter(Medico.especialidad.ilike(f"%{especialidad}%"))
+
     if ciudad:
         query = query.filter(Medico.ciudad.ilike(f"%{ciudad}%"))
+
     if universidad:
         query = query.filter(Medico.universidad_graduacion.ilike(f"%{universidad}%"))
+
     if verificados == "1":
         query = query.filter(Medico.verificado == True)
 
@@ -126,4 +133,3 @@ def editar(medico_id):
 
 
 # --- FEATURE 5: MAPA DE MÉDICOS ---
-
