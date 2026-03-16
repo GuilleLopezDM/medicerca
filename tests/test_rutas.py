@@ -47,4 +47,54 @@ def registrar_usuario_de_prueba(cliente, correo="test@mail.com", password="test1
         "contrasena": password,
         "rol": "paciente",
     }, follow_redirects=False)
+
+def test_inicio_retorna_200(cliente):
+    """GET / debe devolver 200."""
+    respuesta = cliente.get("/")
+    assert respuesta.status_code == 200
+
+
+def test_pagina_login_retorna_200(cliente):
+    """GET /auth/iniciar-sesion debe devolver 200."""
+    respuesta = cliente.get("/auth/iniciar-sesion")
+    assert respuesta.status_code == 200
+
+
+def test_pagina_registro_retorna_200(cliente):
+    """GET /auth/registro debe devolver 200."""
+    respuesta = cliente.get("/auth/registro")
+    assert respuesta.status_code == 200
+
+
+def test_lista_medicos_retorna_200(cliente):
+    """GET /medicos/ debe devolver 200."""
+    respuesta = cliente.get("/medicos/")
+    assert respuesta.status_code == 200
+
+
+def test_registrar_usuario_post_redirige(cliente):
+    """POST /auth/registro con datos válidos debe redirigir (3xx)."""
+    respuesta = registrar_usuario_de_prueba(cliente)
+    assert respuesta.status_code in (301, 302, 303, 307, 308)
+
+
+def test_login_usuario_post_retorna_200(cliente):
+    """POST /auth/iniciar-sesion con credenciales válidas debe retornar 200
+    (siguiendo la redirección final)."""
+    # Primero registramos el usuario
+    registrar_usuario_de_prueba(cliente, correo="login@mail.com")
+
+    # Luego intentamos iniciar sesión siguiendo redirecciones
+    respuesta = cliente.post("/auth/iniciar-sesion", data={
+        "correo": "login@mail.com",
+        "contrasena": "test1234",
+    }, follow_redirects=True)
+
+    assert respuesta.status_code == 200
+
+
+def test_medico_no_existe_retorna_404(cliente):
+    """GET /medicos/9999 debe devolver 404 para un médico inexistente."""
+    respuesta = cliente.get("/medicos/9999")
+    assert respuesta.status_code == 404
 # Tu código acá
