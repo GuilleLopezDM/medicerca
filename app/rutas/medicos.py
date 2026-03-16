@@ -22,21 +22,24 @@ def lista_medicos():
     # Feature 1 — Búsqueda general
     if busqueda:
         query = query.filter(
-            (Usuario.nombre.ilike(f"%{busqueda}%")) | 
-            (Medico.especialidad.ilike(f"%{busqueda}%")) | 
+            (Usuario.nombre.ilike(f"%{busqueda}%")) |
+            (Medico.especialidad.ilike(f"%{busqueda}%")) |
             (Medico.hospital.ilike(f"%{busqueda}%"))
         )
 
-    # Feature 2 (Marcelo)— Filtro por especialidad
+    # Feature 2 — Filtro por especialidad
     if especialidad:
         query = query.filter(Medico.especialidad.ilike(f"%{especialidad}%"))
 
+    # Feature 3  — Filtro por ciudad
     if ciudad:
         query = query.filter(Medico.ciudad.ilike(f"%{ciudad}%"))
 
+    # Feature 4 — Filtro por universidad
     if universidad:
         query = query.filter(Medico.universidad_graduacion.ilike(f"%{universidad}%"))
 
+    # Feature 5 — Solo médicos verificados
     if verificados == "1":
         query = query.filter(Medico.verificado == True)
 
@@ -46,14 +49,25 @@ def lista_medicos():
     # Usamos db.session.query(distintos) para no repetir opciones en los filtros
     especialidades = bd.session.query(Medico.especialidad).distinct().all()
     ciudades = bd.session.query(Medico.ciudad).distinct().all()
+    universidades = bd.session.query(Medico.universidad_graduacion).distinct().all()
+
+    # Feature 7 — filtros actuales para mantener los selects seleccionados
+    filtros_actuales = {
+        "busqueda": busqueda,
+        "especialidad": especialidad,
+        "ciudad": ciudad,
+        "universidad": universidad,
+        "verificados": verificados
+    }
 
     return render_template(
         "medicos/lista.html", 
         medicos=medicos, 
         especialidades=[e[0] for e in especialidades if e[0]],
         ciudades=[c[0] for c in ciudades if c[0]],
+        universidades=[u[0] for u in universidades if u[0]],
         total=len(medicos),
-        filtros_actuales=request.args
+        filtros_actuales=filtros_actuales
     )
 
 #F2 detalle de un medico
