@@ -110,4 +110,3 @@ def eliminar_resena(resena_id):
         flash("No tienes permisos para realizar esta acción.", "danger")
 
     return redirect(url_for('medicos.detalle', medico_id=medico_id))
-
