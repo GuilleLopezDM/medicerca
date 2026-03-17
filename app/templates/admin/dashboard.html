@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block titulo %}Panel Admin — MediCerca{% endblock %}
+
+{% block contenido %}
+<div class="max-w-6xl mx-auto px-4 md:px-8 py-10">
+
+  <!-- Header -->
+  <div class="mb-8 flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight text-[#1F2937]">Panel de administración</h1>
+      <p class="text-sm text-gray-500 mt-1">Bienvenido, {{ current_user.nombre }}. Aquí tenés el resumen del sistema.</p>
+    </div>
+    <a href="{{ url_for('admin.listar_usuarios') }}"
+       class="inline-flex items-center gap-2 bg-[#3B82F6] text-white font-semibold text-sm px-5 py-2.5 rounded-xl
+              hover:bg-[#60A5FA] transition-all duration-200">
+      Gestionar usuarios
+    </a>
+  </div>
+
+  <!-- Estadísticas principales -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+      <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Usuarios</p>
+      <p class="text-3xl font-bold text-[#1F2937]">{{ stats.total_usuarios }}</p>
+      <p class="text-xs text-gray-400 mt-1">registrados en total</p>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+      <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Médicos</p>
+      <p class="text-3xl font-bold text-[#1F2937]">{{ stats.total_medicos }}</p>
+      <p class="text-xs text-gray-400 mt-1">{{ stats.medicos_verificados }} verificados</p>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+      <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Reseñas</p>
+      <p class="text-3xl font-bold text-[#1F2937]">{{ stats.total_resenas }}</p>
+      <p class="text-xs text-gray-400 mt-1">publicadas</p>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+      <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Admins</p>
+      <p class="text-3xl font-bold text-[#1F2937]">{{ stats.por_rol.admin }}</p>
+      <p class="text-xs text-gray-400 mt-1">con acceso total</p>
+    </div>
+
+  </div>
+
+  <div class="grid md:grid-cols-3 gap-6">
+
+    <!-- Distribución por rol -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+      <div class="h-0.5 bg-gradient-to-r from-[#3B82F6] to-[#60A5FA] -mx-6 -mt-6 mb-6 rounded-t-2xl"></div>
+      <h2 class="text-sm font-bold text-[#1F2937] mb-4">Distribución por rol</h2>
+
+      {% set total = stats.total_usuarios %}
+
+      {% for rol, cantidad in [('paciente', stats.por_rol.paciente), ('medico', stats.por_rol.medico), ('admin', stats.por_rol.admin)] %}
+      <div class="mb-4">
+        <div class="flex justify-between text-xs mb-1.5">
+          <span class="font-medium text-gray-600 capitalize">{{ rol }}</span>
+          <span class="text-gray-400">{{ cantidad }} / {{ total }}</span>
+        </div>
+        <div class="w-full bg-gray-100 rounded-full h-2">
+          <div class="h-2 rounded-full
+            {% if rol == 'admin' %}bg-red-400
+            {% elif rol == 'medico' %}bg-[#3B82F6]
+            {% else %}bg-[#8BF57A]{% endif %}"
+            style="width: {{ ((cantidad / total * 100) if total > 0 else 0)|round|int }}%">
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Últimos registros -->
+    <div class="md:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+      <div class="h-0.5 bg-gradient-to-r from-[#3B82F6] to-[#60A5FA] -mx-6 -mt-6 mb-6 rounded-t-2xl"></div>
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-sm font-bold text-[#1F2937]">Últimos usuarios registrados</h2>
+        <a href="{{ url_for('admin.listar_usuarios') }}" class="text-xs text-[#3B82F6] hover:underline">Ver todos →</a>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-gray-100">
+              <th class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wide pb-3">Nombre</th>
+              <th class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wide pb-3">Correo</th>
+              <th class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wide pb-3">Rol</th>
+              <th class="text-left text-xs font-semibold text-gray-400 uppercase tracking-wide pb-3">Fecha</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50">
+            {% for u in stats.ultimos_usuarios %}
+            <tr class="hover:bg-gray-50/60 transition-colors">
+              <td class="py-3 font-medium text-[#1F2937]">{{ u.nombre }}</td>
+              <td class="py-3 text-gray-500 text-xs">{{ u.correo }}</td>
+              <td class="py-3">
+                <span class="px-2 py-0.5 rounded-full text-xs font-semibold
+                  {% if u.rol == 'admin' %}bg-red-50 text-red-500
+                  {% elif u.rol == 'medico' %}bg-blue-50 text-[#3B82F6]
+                  {% else %}bg-green-50 text-green-600{% endif %}">
+                  {{ u.rol }}
+                </span>
+              </td>
+              <td class="py-3 text-gray-400 text-xs">{{ u.creado_en.strftime('%d/%m/%Y') }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
