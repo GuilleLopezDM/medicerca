@@ -13,7 +13,7 @@ from sqlalchemy import UniqueConstraint
 # --- HUGO: user_loader ---
 @gestor_login.user_loader
 def cargar_usuario(usuario_id):
-    return Usuario.query.get(int(usuario_id))
+    return bd.session.get(Usuario, int(usuario_id))
 
 # ============================================================
 #  Modelo Usuario (tabla: usuarios)
@@ -21,17 +21,17 @@ def cargar_usuario(usuario_id):
 class Usuario(UserMixin, bd.Model):
     __tablename__ = "usuarios"
 
-    id              = bd.Column(bd.Integer, primary_key=True)
-    nombre          = bd.Column(bd.String(100), nullable=False)
-    correo          = bd.Column(bd.String(120), unique=True, nullable=False)
-    contrasena_hash = bd.Column(bd.String(256), nullable=False)
-    rol             = bd.Column(bd.String(20), default='paciente')
+    id               = bd.Column(bd.Integer, primary_key=True)
+    nombre           = bd.Column(bd.String(100), nullable=False)
+    correo           = bd.Column(bd.String(120), unique=True, nullable=False)
+    contrasena_hash  = bd.Column(bd.String(256), nullable=False)
+    rol              = bd.Column(bd.String(20), default='paciente')
     email_verificado = bd.Column(bd.Boolean, default=False, nullable=False)
-    creado_en       = bd.Column(bd.DateTime, default=datetime.utcnow)
+    creado_en        = bd.Column(bd.DateTime, default=datetime.utcnow)
 
     # Relaciones
-    perfil_medico   = bd.relationship("Medico", backref="usuario", uselist=False)
-    resenas         = bd.relationship("Resena", backref="autor", lazy=True)
+    perfil_medico = bd.relationship("Medico", backref="usuario", uselist=False)
+    resenas       = bd.relationship("Resena", backref="autor", lazy=True)
 
     def establecer_contrasena(self, contrasena):
         self.contrasena_hash = generate_password_hash(contrasena)
@@ -65,15 +65,16 @@ class Medico(bd.Model):
     creado_en              = bd.Column(bd.DateTime, default=datetime.utcnow)
 
     # Ubicación
-    latitud                = bd.Column(bd.Float, nullable=True)
-    longitud               = bd.Column(bd.Float, nullable=True)
-    direccion_consultorio  = bd.Column(bd.String(255), nullable=True)
+    latitud               = bd.Column(bd.Float, nullable=True)
+    longitud              = bd.Column(bd.Float, nullable=True)
+    direccion_consultorio = bd.Column(bd.String(255), nullable=True)
 
     # Relaciones
-    resenas                = bd.relationship("Resena", backref="medico", lazy=True)
+    resenas = bd.relationship("Resena", backref="medico", lazy=True)
 
     def __repr__(self):
         return f"<Medico {self.especialidad} — matrícula {self.numero_matricula}>"
+
 # ============================================================
 #  Modelo Resena (tabla: resenas)
 # ============================================================
