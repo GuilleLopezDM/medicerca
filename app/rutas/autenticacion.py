@@ -3,6 +3,12 @@ from flask_login import login_user, logout_user, login_required, current_user
 from app import bd
 from app.models.models import Usuario
 
+from app.utils.tokens import (
+    generar_token_reset,
+    verificar_token_reset,
+)
+from app.services.email_service import get_email_service
+
 bp_autenticacion = Blueprint("autenticacion", __name__, url_prefix="/auth")
 
 
@@ -69,15 +75,20 @@ def procesar_registro():
     nuevo_usuario = Usuario(
         nombre=nombre,
         correo=correo,
-        rol=rol
+        rol=rol,
+        email_verificado=True,
     )
     nuevo_usuario.establecer_contrasena(contrasena)
 
     bd.session.add(nuevo_usuario)
     bd.session.commit()
 
-    flash("Cuenta creada exitosamente.", "success")
-    return redirect(url_for("autenticacion.iniciar_sesion"))
+    # Enviar correo de bienvenida
+    get_email_service().enviar_bienvenida(email=correo, nombre=nombre)
+
+    login_user(nuevo_usuario)
+    flash("¡Cuenta creada exitosamente! Bienvenido/a a MediCerca.", "success")
+    return redirect(url_for("principal.inicio"))
 
 
 # logout
@@ -87,3 +98,62 @@ def cerrar_sesion():
     logout_user()
     flash("Sesión cerrada.", "info")
     return redirect(url_for("principal.inicio"))
+
+
+# ── recuperar contraseña paso 1 (pedir email) ─────
+@bp_autenticacion.route("/recuperar", methods=["GET", "POST"])
+def recuperar_contrasena():
+    if request.method == "POST":
+        correo = request.form.get("correo", "").strip().lower()
+        usuario = Usuario.query.filter_by(correo=correo).first()
+
+        if usuario:
+            token = generar_token_reset(correo)
+            get_email_service().enviar_reset_contrasena(
+                email=correo,
+                nombre=usuario.nombre,
+                token=token,
+            )
+
+        flash(
+            "Si ese correo está registrado, te enviamos las instrucciones.",
+            "success",
+        )
+        return redirect(url_for("autenticacion.iniciar_sesion"))
+
+    return render_template("autenticacion/recuperar_contrasena.html")
+
+
+# ── recuperar contraseña paso 2 (setear nueva) ────
+@bp_autenticacion.route("/nueva-contrasena/<token>", methods=["GET", "POST"])
+def nueva_contrasena(token):
+    correo, error = verificar_token_reset(token)
+
+    if error == "expirado":
+        flash("El enlace expiró. Solicitá uno nuevo.", "warning")
+        return redirect(url_for("autenticacion.recuperar_contrasena"))
+
+    if error or not correo:
+        flash("El enlace no es válido.", "danger")
+        return redirect(url_for("autenticacion.recuperar_contrasena"))
+
+    if request.method == "POST":
+        nueva   = request.form.get("contrasena", "")
+        repetir = request.form.get("confirmar", "")
+
+        if len(nueva) < 8:
+            flash("La contraseña debe tener al menos 8 caracteres.", "danger")
+            return render_template("autenticacion/nueva_contrasena.html", token=token)
+
+        if nueva != repetir:
+            flash("Las contraseñas no coinciden.", "danger")
+            return render_template("autenticacion/nueva_contrasena.html", token=token)
+
+        usuario = Usuario.query.filter_by(correo=correo).first()
+        usuario.establecer_contrasena(nueva)
+        bd.session.commit()
+
+        flash("✅ Contraseña actualizada. Ya podés iniciar sesión.", "success")
+        return redirect(url_for("autenticacion.iniciar_sesion"))
+
+    return render_template("autenticacion/nueva_contrasena.html", token=token)
