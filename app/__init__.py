@@ -1,6 +1,9 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
 bd = SQLAlchemy()
 gestor_login = LoginManager()
@@ -9,7 +12,7 @@ gestor_login = LoginManager()
 def crear_app():
     app = Flask(__name__)
 
-    app.config["SECRET_KEY"] = "dev-secret-key"
+    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-key")
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///medicerca.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -43,5 +46,8 @@ def crear_app():
     # app.register_blueprint(bp_busqueda, url_prefix="/busqueda")
     # from app.rutas.perfil import bp_perfil              # Diego
     # app.register_blueprint(bp_perfil, url_prefix="/perfil")
+    from app.rutas.resenas import bp_resenas
+    app.register_blueprint(bp_resenas)
+
 
     return app

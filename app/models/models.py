@@ -26,6 +26,7 @@ class Usuario(UserMixin, bd.Model):
     correo          = bd.Column(bd.String(120), unique=True, nullable=False)
     contrasena_hash = bd.Column(bd.String(256), nullable=False)
     rol             = bd.Column(bd.String(20), default='paciente')
+    email_verificado = bd.Column(bd.Boolean, default=False, nullable=False)
     creado_en       = bd.Column(bd.DateTime, default=datetime.utcnow)
 
     # Relaciones
