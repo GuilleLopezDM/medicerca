@@ -3,52 +3,63 @@
 #  Tu tarea: rutas del mapa de médicos con Leaflet.js
 # ============================================================
 
-from flask import Blueprint, render_template, jsonify
-# from app.models import Medico  # Descomentar cuando Hugo termine
+from flask import Blueprint, render_template, jsonify, request, flash, redirect, url_for
+from flask_login import login_required, current_user
+from app import bd
+from app.models.models import Medico
 
 bp_mapa = Blueprint("mapa", __name__)
 
 
 # --- FEATURE 1: PÁGINA DEL MAPA ---
-# GET /mapa/ → página con el mapa de Leaflet.js
-# Muestra todos los médicos con latitud y longitud cargados
-# Al hacer click en un marcador → muestra preview del médico
-# @bp_mapa.route("/")
-# def mapa_medicos():
-#     pass  # TODO
+@bp_mapa.route("/")
+def mapa_medicos():
+    return render_template("mapa/mapa.html")
 
 
 # --- FEATURE 2: API DE MÉDICOS PARA EL MAPA ---
-# GET /mapa/medicos.json → retorna JSON con todos los médicos que tienen coordenadas
-# Este endpoint lo consume Leaflet.js desde el frontend (JavaScript)
-# Formato de respuesta:
-# [
-#   {
-#     "id": 1,
-#     "nombre": "Dr. Juan Pérez",
-#     "especialidad": "Cardiología",
-#     "hospital": "Hospital Central",
-#     "ciudad": "Asunción",
-#     "calificacion_promedio": 4.5,
-#     "total_resenas": 12,
-#     "verificado": true,
-#     "latitud": -25.2867,
-#     "longitud": -57.6470,
-#     "direccion_consultorio": "Av. España 123, Asunción",
-#     "url_perfil": "/medicos/1"
-#   },
-#   ...
-# ]
-# @bp_mapa.route("/medicos.json")
-# def medicos_json():
-#     pass  # TODO
+@bp_mapa.route("/medicos.json")
+def medicos_json():
+    medicos = Medico.query.filter(Medico.latitud.isnot(None)).all()
+
+    resultado = []
+    for medico in medicos:
+        resultado.append({
+            "id":                    medico.id,
+            "nombre":                medico.usuario.nombre,
+            "especialidad":          medico.especialidad,
+            "hospital":              medico.hospital,
+            "ciudad":                medico.ciudad,
+            "calificacion_promedio": medico.calificacion_promedio,
+            "total_resenas":         medico.total_resenas,
+            "verificado":            medico.verificado,
+            "latitud":               medico.latitud,
+            "longitud":              medico.longitud,
+            "direccion_consultorio": medico.direccion_consultorio,
+            "url_perfil":            f"/medicos/{medico.id}"
+        })
+
+    return jsonify(resultado)
 
 
 # --- FEATURE 3: GUARDAR UBICACIÓN DEL MÉDICO ---
-# POST /mapa/guardar-ubicacion → el médico selecciona su ubicación en el mapa
-# Recibe: latitud, longitud, direccion_consultorio
-# Solo accesible para el médico dueño del perfil o admin
-# @bp_mapa.route("/guardar-ubicacion", methods=["POST"])
-# @login_required
-# def guardar_ubicacion():
-#     pass  # TODO
+@bp_mapa.route("/seleccionar/<int:medico_id>")
+@login_required
+def seleccionar_ubicacion(medico_id):
+    medico = Medico.query.get_or_404(medico_id)
+    return render_template("mapa/seleccionar_ubicacion.html", medico=medico)
+
+
+@bp_mapa.route("/guardar-ubicacion", methods=["POST"])
+@login_required
+def guardar_ubicacion():
+    medico = Medico.query.filter_by(usuario_id=current_user.id).first_or_404()
+
+    medico.latitud               = request.form.get("latitud", type=float)
+    medico.longitud              = request.form.get("longitud", type=float)
+    medico.direccion_consultorio = request.form.get("direccion_consultorio", "")
+
+    bd.session.commit()
+
+    flash("Ubicación guardada correctamente.", "success")
+    return redirect(url_for("medicos.detalle_medico", medico_id=medico.id))

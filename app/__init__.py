@@ -29,11 +29,13 @@ def crear_app():
 
     from app.rutas.autenticacion import bp_autenticacion
     app.register_blueprint(bp_autenticacion)
-    # TODO: Arturo — from app.rutas.principal import bp_principal
-    #                 app.register_blueprint(bp_principal)
-    # TODO: Hugo — from app.rutas.busqueda import bp_busqueda
-    #               app.register_blueprint(bp_busqueda)
-    # TODO: Diego — from app.rutas.perfil import bp_perfil
-    #                app.register_blueprint(bp_perfil)
+    from app.rutas.principal import bp_principal       # Arturo - Feature 1 y 2
+    app.register_blueprint(bp_principal)
+    from app.rutas.mapa import bp_mapa                 # Arturo - Features 3, 4 y 5
+    app.register_blueprint(bp_mapa, url_prefix="/mapa")
+    # from app.rutas.busqueda import bp_busqueda          # Hugo
+    # app.register_blueprint(bp_busqueda, url_prefix="/busqueda")
+    # from app.rutas.perfil import bp_perfil              # Diego
+    # app.register_blueprint(bp_perfil, url_prefix="/perfil")
 
     return app
