@@ -1,20 +1,63 @@
-{# ARTURO: este template se incluye dentro de medicos/detalle.html
-   Uso: {% include 'medicos/resenas.html' %}
-   Espera la variable: medico #}
+{# Uso opcional dentro de medicos/detalle.html. Requiere: medico y current_user #}
 
-<!-- SECCIÓN DE RATING -->
-<!-- TODO: Mostrar calificación promedio con estrellas (medico.calificacion) -->
-<!-- Ejemplo visual: ⭐⭐⭐⭐☆ 4.0 (12 reseñas) -->
+<section class="bg-white rounded-3xl border border-gray-100/80 shadow-card p-6 md:p-7">
+  <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mb-8">
+    <div>
+      <p class="text-xs uppercase tracking-[0.3em] text-slate-400 mb-2">Reseñas</p>
+      <h2 class="text-2xl font-bold text-[#1F2937] dark:text-slate-100">Experiencias de pacientes</h2>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">Valoraciones públicas para ayudar a otros usuarios a decidir mejor.</p>
+    </div>
 
-<!-- FORMULARIO PARA DEJAR RESEÑA -->
-<!-- Solo visible si current_user.is_authenticated -->
-<!-- TODO: form con POST a /resenas/crear/{{ medico.id }} -->
-<!-- Campos: puntuacion (5 radio buttons o estrellas clickeables), comentario (textarea) -->
+    <div class="rounded-3xl bg-[#F0F9FF] dark:bg-slate-900 border border-slate-100 dark:border-slate-700 px-5 py-4 min-w-[220px]">
+      <div class="text-3xl font-bold text-[#1F2937] dark:text-slate-100">{{ medico.calificacion_promedio or '—' }}</div>
+      <div class="text-amber-400 text-lg mt-1">
+        {% set promedio = medico.calificacion_promedio|default(0)|round(0, 'floor')|int %}
+        {{ '★' * promedio }}{{ '☆' * (5 - promedio) }}
+      </div>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">{{ medico.total_resenas or 0 }} reseña{{ 's' if (medico.total_resenas or 0) != 1 else '' }}</p>
+    </div>
+  </div>
 
-<!-- LISTA DE RESEÑAS EXISTENTES -->
-<!-- TODO: iterar medico.resenas, mostrar: -->
-<!--   - nombre del autor (resena.autor.nombre) -->
-<!--   - puntuacion en estrellas -->
-<!--   - comentario -->
-<!--   - fecha (resena.creado_en) -->
-<!--   - botón eliminar si current_user.id == resena.autor_id o admin -->
+  {% if current_user.is_authenticated and current_user.id != medico.usuario_id %}
+  <form method="POST" action="{{ url_for('resenas.agregar_resena', medico_id=medico.id) }}" class="mb-8 rounded-3xl border border-slate-100 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-900/70 p-5 space-y-4">
+    <div>
+      <label class="block text-sm font-semibold text-[#1F2937] dark:text-slate-100 mb-2">Tu puntuación</label>
+      <div class="flex items-center gap-2 text-2xl text-amber-400">
+        {% for value in range(1, 6) %}
+        <label class="cursor-pointer">
+          <input type="radio" name="puntuacion" value="{{ value }}" class="sr-only" {% if value == 5 %}checked{% endif %}>
+          <span>★</span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+    <div>
+      <label for="comentario" class="block text-sm font-semibold text-[#1F2937] dark:text-slate-100 mb-2">Comentario</label>
+      <textarea id="comentario" name="comentario" rows="4" placeholder="Contá tu experiencia con este profesional..." class="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 outline-none focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent resize-none"></textarea>
+    </div>
+    <button type="submit" class="inline-flex items-center gap-2 bg-[#3B82F6] text-white font-semibold text-sm px-5 py-3 rounded-2xl hover:bg-[#60A5FA] transition-all duration-200">Publicar reseña</button>
+  </form>
+  {% endif %}
+
+  <div class="space-y-4">
+    {% for resena in medico.resenas %}
+    <article class="rounded-3xl border border-slate-100 dark:border-slate-700 p-5 hover:border-slate-200 dark:hover:border-slate-600 transition-colors duration-200">
+      <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
+        <div>
+          <p class="font-semibold text-[#1F2937] dark:text-slate-100">{{ resena.autor.nombre }}</p>
+          <p class="text-xs text-slate-400 mt-1">{{ resena.creado_en }}</p>
+        </div>
+        <div class="text-amber-400 text-sm">{{ '★' * resena.puntuacion }}{{ '☆' * (5 - resena.puntuacion) }}</div>
+      </div>
+      {% if resena.comentario %}
+      <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{{ resena.comentario }}</p>
+      {% endif %}
+    </article>
+    {% else %}
+    <div class="text-center py-12 rounded-3xl bg-slate-50/70 dark:bg-slate-900/60 border border-dashed border-slate-200 dark:border-slate-700">
+      <div class="text-4xl mb-3 opacity-35">💬</div>
+      <p class="text-sm text-slate-500 dark:text-slate-400">Todavía no hay reseñas para este médico.</p>
+    </div>
+    {% endfor %}
+  </div>
+</section>

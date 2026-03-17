@@ -2,99 +2,113 @@
 {% block titulo %}Mi Panel — MediCerca{% endblock %}
 
 {% block contenido %}
+<div class="max-w-6xl mx-auto px-4 md:px-8 py-10">
 
-<div class="max-w-5xl mx-auto px-6 py-10">
-
-  <!-- SALUDO -->
-  <h1 class="text-3xl font-bold text-[#252529] mb-8">
-    Bienvenido, {{ current_user.nombre }}
-  </h1>
-
-
-  <div class="grid md:grid-cols-2 gap-6">
-
-    <!-- SECCIÓN MÉDICO -->
-    {% if current_user.rol == 'medico' %}
-
-      {% if current_user.perfil_medico %}
-
-      <!-- TIENE PERFIL -->
-      <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-
-        <h2 class="text-xl font-semibold mb-2">
-          Tu perfil médico
-        </h2>
-
-        <p class="text-[#205ea6] font-medium mb-4">
-          {{ current_user.perfil_medico.especialidad }}
+  <section class="glass-card rounded-[2rem] shadow-card border border-white/50 p-6 md:p-8 mb-8 overflow-hidden relative">
+    <div class="absolute inset-0 bg-gradient-to-br from-[#3B82F6]/8 via-transparent to-[#60A5FA]/10 pointer-events-none"></div>
+    <div class="relative flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400 mb-2">Panel personal</p>
+        <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-[#1F2937] dark:text-slate-100">Hola, {{ current_user.nombre }} 👋</h1>
+        <p class="text-sm md:text-base text-slate-500 dark:text-slate-400 mt-3 max-w-2xl">
+          {% if current_user.rol == 'medico' %}
+            Gestioná tu presencia profesional, revisá cómo se ve tu perfil y mantené tu información actualizada.
+          {% else %}
+            Explorá especialistas, guardá tu flujo de búsqueda y accedé rápido al directorio y al mapa.
+          {% endif %}
         </p>
+      </div>
+      <div class="grid grid-cols-2 gap-3 min-w-[220px]">
+        <div class="rounded-2xl bg-white/80 dark:bg-slate-900/70 border border-white/70 dark:border-slate-700 px-4 py-3">
+          <p class="text-xs uppercase tracking-wide text-slate-400">Rol</p>
+          <p class="text-sm font-semibold text-[#1F2937] dark:text-slate-100 mt-1">{{ 'Médico' if current_user.rol == 'medico' else 'Paciente' }}</p>
+        </div>
+        <div class="rounded-2xl bg-white/80 dark:bg-slate-900/70 border border-white/70 dark:border-slate-700 px-4 py-3">
+          <p class="text-xs uppercase tracking-wide text-slate-400">Acceso</p>
+          <p class="text-sm font-semibold text-[#1F2937] dark:text-slate-100 mt-1">Cuenta activa</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        <div class="flex gap-3">
+  <div class="grid xl:grid-cols-3 md:grid-cols-2 gap-5">
 
-          <a
-            href="{{ url_for('medicos.detalle_medico', medico_id=current_user.perfil_medico.id) }}"
-            class="px-4 py-2 rounded-xl bg-[#8BF57A] text-[#252529] font-medium hover:opacity-90 transition">
-            Ver perfil
-          </a>
-
-          <a
-            href="{{ url_for('medicos.editar_medico', medico_id=current_user.perfil_medico.id) }}"
-            class="px-4 py-2 rounded-xl border border-gray-300 hover:bg-gray-100 transition">
-            Editar
-          </a>
-
+    {% if current_user.rol == 'medico' %}
+      {% if current_user.perfil_medico %}
+      <section class="bg-white rounded-3xl border border-gray-100/80 shadow-card p-6 md:p-7 md:col-span-2 xl:col-span-2 hover:shadow-lift transition-all duration-300">
+        <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
+          <div class="flex items-start gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#F0F9FF] to-[#60A5FA] text-2xl flex items-center justify-center shadow-sm">👨‍⚕️</div>
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <h2 class="text-xl font-bold text-[#1F2937] dark:text-slate-100">Tu perfil médico</h2>
+                {% if current_user.perfil_medico.verificado %}
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#3B82F6]/10 text-[#3B82F6] border border-[#3B82F6]/20">Verificado</span>
+                {% endif %}
+              </div>
+              <p class="text-sm font-medium text-[#3B82F6] mt-1">{{ current_user.perfil_medico.especialidad }}</p>
+              <p class="text-sm text-slate-500 dark:text-slate-400 mt-3 max-w-xl">Desde acá podés revisar la información pública de tu perfil y mantener actualizados tus datos profesionales.</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3 min-w-[220px]">
+            <div class="rounded-2xl bg-[#F0F9FF] dark:bg-slate-900 border border-slate-100 dark:border-slate-700 p-4 text-center">
+              <p class="text-2xl font-bold text-[#1F2937] dark:text-slate-100">{{ current_user.perfil_medico.total_resenas or 0 }}</p>
+              <p class="text-xs text-slate-400 mt-1">Reseñas</p>
+            </div>
+            <div class="rounded-2xl bg-[#F0F9FF] dark:bg-slate-900 border border-slate-100 dark:border-slate-700 p-4 text-center">
+              <p class="text-2xl font-bold text-[#1F2937] dark:text-slate-100">{{ current_user.perfil_medico.calificacion_promedio or '—' }}</p>
+              <p class="text-xs text-slate-400 mt-1">Promedio</p>
+            </div>
+          </div>
         </div>
 
-      </div>
-
+        <div class="grid sm:grid-cols-3 gap-3 mt-6 pt-6 border-t border-gray-100 dark:border-slate-700">
+          <a href="{{ url_for('medicos.detalle_medico', medico_id=current_user.perfil_medico.id) }}" class="inline-flex items-center justify-center gap-2 bg-[#3B82F6] text-white font-semibold text-sm px-5 py-3 rounded-2xl hover:bg-[#60A5FA] hover:-translate-y-0.5 transition-all duration-200">Ver perfil</a>
+          <a href="{{ url_for('medicos.editar_medico', medico_id=current_user.perfil_medico.id) }}" class="inline-flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-200 font-medium text-sm px-5 py-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-200">Editar datos</a>
+          <a href="{{ url_for('mapa.mapa_medicos') }}" class="inline-flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-200 font-medium text-sm px-5 py-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-200">Ver en mapa</a>
+        </div>
+      </section>
       {% else %}
-
-      <!-- NO TIENE PERFIL -->
-      <div class="bg-[#cbe4fe] p-6 rounded-2xl border border-blue-100 shadow-sm">
-
-        <h2 class="text-xl font-semibold mb-2">
-          ¡Creá tu perfil médico!
-        </h2>
-
-        <p class="text-gray-700 mb-4">
-          Completá tu información para aparecer en el directorio y recibir pacientes.
-        </p>
-
-        <a
-          href="{{ url_for('medicos.registrar_medico') }}"
-          class="inline-block bg-[#8BF57A] text-[#252529] px-5 py-2 rounded-xl font-medium hover:opacity-90 transition">
-          Crear perfil
-        </a>
-
-      </div>
-
+      <section class="bg-gradient-to-br from-[#F0F9FF] via-white to-[#60A5FA]/20 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-card p-6 md:p-7 md:col-span-2 xl:col-span-2 hover:shadow-lift transition-all duration-300">
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-white/80 dark:bg-slate-800 text-[#3B82F6] border border-white/80 dark:border-slate-700 mb-5">Perfil pendiente</span>
+        <h2 class="text-2xl font-bold text-[#1F2937] dark:text-slate-100 mb-2">Creá tu perfil médico</h2>
+        <p class="text-sm text-slate-500 dark:text-slate-400 max-w-2xl mb-6">Completá tus datos profesionales para aparecer en el directorio, mejorar tu visibilidad y permitir que los pacientes te encuentren fácilmente.</p>
+        <div class="flex flex-wrap gap-3">
+          <a href="{{ url_for('medicos.registrar_medico') }}" class="inline-flex items-center gap-2 bg-[#3B82F6] text-white font-semibold text-sm px-5 py-3 rounded-2xl hover:bg-[#60A5FA] hover:-translate-y-0.5 transition-all duration-200">Crear perfil</a>
+          <span class="inline-flex items-center px-4 py-3 rounded-2xl text-sm text-slate-500 dark:text-slate-400 bg-white/70 dark:bg-slate-900/60 border border-white/80 dark:border-slate-700">Tiempo estimado: menos de 5 minutos</span>
+        </div>
+      </section>
       {% endif %}
-
     {% endif %}
 
+    <section class="bg-white rounded-3xl border border-gray-100/80 shadow-card p-6 hover:shadow-lift transition-all duration-300">
+      <div class="w-12 h-12 rounded-2xl bg-[#F0F9FF] dark:bg-slate-900 flex items-center justify-center text-2xl mb-4">🔍</div>
+      <h2 class="text-lg font-bold text-[#1F2937] dark:text-slate-100">Directorio de médicos</h2>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 mb-6">Entrá rápido al listado, aplicá filtros y encontrá especialistas por ciudad, universidad o especialidad.</p>
+      <a href="{{ url_for('medicos.lista_medicos') }}" class="inline-flex items-center gap-2 bg-[#3B82F6] text-white font-semibold text-sm px-5 py-3 rounded-2xl hover:bg-[#60A5FA] transition-all duration-200">Abrir directorio</a>
+    </section>
 
+    <section class="bg-white rounded-3xl border border-gray-100/80 shadow-card p-6 hover:shadow-lift transition-all duration-300">
+      <div class="w-12 h-12 rounded-2xl bg-[#F0F9FF] dark:bg-slate-900 flex items-center justify-center text-2xl mb-4">🗺️</div>
+      <h2 class="text-lg font-bold text-[#1F2937] dark:text-slate-100">Mapa interactivo</h2>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 mb-6">Explorá médicos cercanos visualmente y usá la distribución geográfica para decidir mejor.</p>
+      <a href="{{ url_for('mapa.mapa_medicos') }}" class="inline-flex items-center gap-2 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-200 font-medium text-sm px-5 py-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-200">Abrir mapa</a>
+    </section>
 
-    <!-- DIRECTORIO (SIEMPRE VISIBLE) -->
-    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-
-      <h2 class="text-xl font-semibold mb-2">
-        Directorio de médicos
-      </h2>
-
-      <p class="text-gray-600 mb-4">
-        Explorá médicos por especialidad, ubicación y más.
-      </p>
-
-      <a
-        href="{{ url_for('medicos.lista_medicos') }}"
-        class="inline-block bg-[#8BF57A] text-[#252529] px-5 py-2 rounded-xl font-medium hover:opacity-90 transition">
-        Ver directorio
-      </a>
-
-    </div>
-
+    <section class="bg-white rounded-3xl border border-gray-100/80 shadow-card p-6 hover:shadow-lift transition-all duration-300">
+      <div class="w-12 h-12 rounded-2xl bg-[#F0F9FF] dark:bg-slate-900 flex items-center justify-center text-2xl mb-4">✨</div>
+      <h2 class="text-lg font-bold text-[#1F2937] dark:text-slate-100">Atajos útiles</h2>
+      <ul class="space-y-3 text-sm text-slate-500 dark:text-slate-400 mb-6">
+        <li class="flex items-start gap-2"><span class="mt-1 w-1.5 h-1.5 rounded-full bg-[#3B82F6]"></span><span>Diseño optimizado para lectura rápida y mejor jerarquía visual.</span></li>
+        <li class="flex items-start gap-2"><span class="mt-1 w-1.5 h-1.5 rounded-full bg-[#3B82F6]"></span><span>Modo claro por defecto con opción de modo oscuro persistente.</span></li>
+        <li class="flex items-start gap-2"><span class="mt-1 w-1.5 h-1.5 rounded-full bg-[#3B82F6]"></span><span>Barra superior de progreso para acompañar el scroll en páginas largas.</span></li>
+      </ul>
+      {% if current_user.rol == 'medico' and not current_user.perfil_medico %}
+      <a href="{{ url_for('medicos.registrar_medico') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-[#3B82F6] hover:underline">Completar perfil ahora</a>
+      {% else %}
+      <a href="{{ url_for('principal.inicio') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-[#3B82F6] hover:underline">Volver al inicio</a>
+      {% endif %}
+    </section>
   </div>
-
 </div>
-
 {% endblock %}

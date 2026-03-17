@@ -3,135 +3,135 @@
 
 {% block contenido %}
 
-<div class="max-w-4xl mx-auto px-6 py-10">
+<div class="max-w-3xl mx-auto px-4 md:px-8 py-10">
 
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+  <!-- Breadcrumb -->
+  <nav class="flex items-center gap-2 text-xs text-gray-400 font-medium mb-8">
+    <a href="{{ url_for('principal.panel') }}" class="hover:text-[#3B82F6] transition-colors duration-150">Panel</a>
+    <span class="text-gray-300">›</span>
+    <span class="text-gray-600">Registrar perfil médico</span>
+  </nav>
 
-    <!-- TÍTULO -->
-    <h1 class="text-2xl font-bold text-[#252529] mb-6">
-      Registrar Perfil Médico
-    </h1>
+  <div class="bg-white rounded-2xl border border-gray-100/80 shadow-card overflow-hidden">
+    <div class="h-0.5 bg-gradient-to-r from-[#3B82F6] to-[#60A5FA]"></div>
 
-    <form method="POST" action="{{ url_for('medicos.registrar_medico') }}" class="space-y-6">
+    <div class="p-6 md:p-8">
 
-      <!-- GRILLA -->
-      <div class="grid md:grid-cols-2 gap-5">
-
-        <!-- ESPECIALIDAD -->
-        <div>
-          <label class="block text-sm text-gray-600 mb-1">
-            Especialidad
-          </label>
-          <input
-            type="text"
-            name="especialidad"
-            required
-            class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-[#8BF57A] focus:border-[#8BF57A]"
-          >
-        </div>
-
-        <!-- MATRICULA -->
-        <div>
-          <label class="block text-sm text-gray-600 mb-1">
-            Número de matrícula
-          </label>
-          <input
-            type="text"
-            name="numero_matricula"
-            required
-            class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-[#8BF57A]"
-          >
-        </div>
-
-        <!-- HOSPITAL -->
-        <div>
-          <label class="block text-sm text-gray-600 mb-1">
-            Hospital / Clínica
-          </label>
-          <input
-            type="text"
-            name="hospital"
-            class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-[#8BF57A]"
-          >
-        </div>
-
-        <!-- CIUDAD -->
-        <div>
-          <label class="block text-sm text-gray-600 mb-1">
-            Ciudad
-          </label>
-          <input
-            type="text"
-            name="ciudad"
-            class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-[#8BF57A]"
-          >
-        </div>
-
-        <!-- TELEFONO -->
-        <div>
-          <label class="block text-sm text-gray-600 mb-1">
-            Teléfono
-          </label>
-          <input
-            type="text"
-            name="telefono"
-            class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-[#8BF57A]"
-          >
-        </div>
-
-        <!-- EXPERIENCIA -->
-        <div>
-          <label class="block text-sm text-gray-600 mb-1">
-            Años de experiencia
-          </label>
-          <input
-            type="number"
-            name="anios_experiencia"
-            min="0"
-            class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-[#8BF57A]"
-          >
-        </div>
-
-        <!-- UNIVERSIDAD -->
-        <div class="md:col-span-2">
-          <label class="block text-sm text-gray-600 mb-1">
-            Universidad de graduación
-          </label>
-          <input
-            type="text"
-            name="universidad_graduacion"
-            class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-[#8BF57A]"
-          >
-        </div>
-
+      <div class="mb-8 pb-6 border-b border-gray-100">
+        <h1 class="text-xl font-bold tracking-tight text-[#1F2937]">Registrar perfil médico</h1>
+        <p class="text-sm text-gray-500 mt-1">Completá tu información para aparecer en el directorio.</p>
       </div>
 
+      <form method="POST" action="{{ url_for('medicos.registrar_medico') }}" class="space-y-10">
 
-      <!-- BIOGRAFIA -->
-      <div>
-        <label class="block text-sm text-gray-600 mb-1">
-          Biografía
-        </label>
+        <!-- Section 1 -->
+        <div>
+          <p class="text-xs font-bold text-gray-300 uppercase tracking-widest mb-5">Datos principales</p>
+          <div class="grid md:grid-cols-2 gap-4">
 
-        <textarea
-          name="biografia"
-          rows="4"
-          class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-[#8BF57A]"
-        ></textarea>
-      </div>
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                Especialidad <span class="text-red-400 normal-case font-normal">*</span>
+              </label>
+              <input type="text" name="especialidad" required placeholder="Ej: Cardiología"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                            focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent focus:bg-white
+                            hover:border-gray-300 transition-all duration-200">
+            </div>
 
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                Matrícula <span class="text-red-400 normal-case font-normal">*</span>
+              </label>
+              <input type="text" name="numero_matricula" required placeholder="Ej: 12345"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                            focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent focus:bg-white
+                            hover:border-gray-300 transition-all duration-200">
+            </div>
 
-      <!-- BOTON -->
-      <div class="pt-2">
-        <button
-          type="submit"
-          class="bg-[#8BF57A] text-[#252529] font-medium px-6 py-2.5 rounded-xl hover:opacity-90 transition">
-          Guardar perfil
-        </button>
-      </div>
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Hospital / Clínica</label>
+              <input type="text" name="hospital" placeholder="Nombre del hospital"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                            focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent focus:bg-white
+                            hover:border-gray-300 transition-all duration-200">
+            </div>
 
-    </form>
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Ciudad</label>
+              <input type="text" name="ciudad" placeholder="Ej: Asunción"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                            focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent focus:bg-white
+                            hover:border-gray-300 transition-all duration-200">
+            </div>
 
+          </div>
+        </div>
+
+        <!-- Section 2 -->
+        <div>
+          <p class="text-xs font-bold text-gray-300 uppercase tracking-widest mb-5">Contacto & Experiencia</p>
+          <div class="grid md:grid-cols-2 gap-4">
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Teléfono</label>
+              <input type="text" name="telefono" placeholder="+595 21 000 000"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                            focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent focus:bg-white
+                            hover:border-gray-300 transition-all duration-200">
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Años de experiencia</label>
+              <input type="number" name="anios_experiencia" min="0" placeholder="Ej: 10"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                            focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent focus:bg-white
+                            hover:border-gray-300 transition-all duration-200">
+            </div>
+
+            <div class="md:col-span-2 space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Universidad de graduación</label>
+              <input type="text" name="universidad_graduacion" placeholder="Universidad Nacional de Asunción"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                            focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent focus:bg-white
+                            hover:border-gray-300 transition-all duration-200">
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Section 3 -->
+        <div>
+          <p class="text-xs font-bold text-gray-300 uppercase tracking-widest mb-5">Presentación</p>
+          <div class="space-y-1.5">
+            <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">
+              Biografía <span class="text-gray-300 normal-case font-normal">(opcional)</span>
+            </label>
+            <textarea name="biografia" rows="4"
+                      placeholder="Describí tu experiencia, áreas de especialización, enfoque profesional..."
+                      class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                             focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent focus:bg-white
+                             hover:border-gray-300 transition-all duration-200 resize-none"></textarea>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <div class="flex items-center gap-3 pt-2 border-t border-gray-100">
+          <button type="submit"
+                  class="inline-flex items-center gap-2 bg-[#3B82F6] text-white font-semibold text-sm px-6 py-3 rounded-xl
+                         hover:bg-[#60A5FA] hover:scale-[1.02] hover:shadow-[0_4px_16px_rgba(59,130,246,0.24)]
+                         active:scale-[0.98] transition-all duration-200">
+            Guardar perfil
+          </button>
+          <a href="{{ url_for('principal.panel') }}"
+             class="px-5 py-3 rounded-xl border border-gray-200 text-sm font-medium text-gray-500
+                    hover:border-gray-300 hover:bg-gray-50 transition-all duration-200">
+            Cancelar
+          </a>
+        </div>
+
+      </form>
+    </div>
   </div>
 
 </div>

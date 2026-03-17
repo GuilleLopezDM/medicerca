@@ -1,139 +1,144 @@
 {% extends "base.html" %}
-{% block titulo %}Editar Perfil — MediCerca{% endblock %}
+{% block titulo %}Editar perfil — MediCerca{% endblock %}
 
 {% block contenido %}
 
-<div class="max-w-4xl mx-auto px-6 py-10">
+<div class="max-w-3xl mx-auto px-4 md:px-8 py-10">
 
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+  <!-- Breadcrumb -->
+  <nav class="flex items-center gap-2 text-xs text-gray-400 font-medium mb-8">
+    <a href="{{ url_for('principal.panel') }}" class="hover:text-[#3B82F6] transition-colors duration-150">Panel</a>
+    <span class="text-gray-300">›</span>
+    <a href="{{ url_for('medicos.detalle_medico', medico_id=medico.id) }}" class="hover:text-[#3B82F6] transition-colors duration-150 truncate max-w-[120px]">{{ medico.usuario.nombre }}</a>
+    <span class="text-gray-300">›</span>
+    <span class="text-gray-600">Editar</span>
+  </nav>
 
-    <!-- TÍTULO -->
-    <h1 class="text-2xl font-bold text-[#252529] mb-6">
-      Editar Perfil Médico
-    </h1>
+  <div class="bg-white rounded-2xl border border-gray-100/80 shadow-card overflow-hidden">
+    <div class="h-0.5 bg-gradient-to-r from-[#3B82F6] to-[#60A5FA]"></div>
 
-    <form method="POST"
-          action="{{ url_for('medicos.editar_medico', medico_id=medico.id) }}"
-          class="space-y-6">
+    <div class="p-6 md:p-8">
 
-      <!-- GRILLA -->
-      <div class="grid md:grid-cols-2 gap-5">
-
-        <!-- ESPECIALIDAD -->
-        <div>
-          <label class="block text-sm text-gray-600 mb-1">Especialidad</label>
-          <input
-            type="text"
-            name="especialidad"
-            value="{{ medico.especialidad }}"
-            required
-            class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-[#8BF57A] focus:border-[#8BF57A]"
-          >
-        </div>
-
-        <!-- MATRÍCULA (NO EDITABLE) -->
-        <div>
-          <label class="block text-sm text-gray-600 mb-1">Número de matrícula</label>
-          <input
-            type="text"
-            value="{{ medico.numero_matricula }}"
-            disabled
-            class="w-full border border-gray-200 bg-gray-100 rounded-xl px-4 py-2 text-gray-500 cursor-not-allowed"
-          >
-          <p class="text-xs text-gray-400 mt-1">
-            La matrícula no puede modificarse.
-          </p>
-        </div>
-
-        <!-- HOSPITAL -->
-        <div>
-          <label class="block text-sm text-gray-600 mb-1">Hospital / Clínica</label>
-          <input
-            type="text"
-            name="hospital"
-            value="{{ medico.hospital }}"
-            class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-[#8BF57A]"
-          >
-        </div>
-
-        <!-- CIUDAD -->
-        <div>
-          <label class="block text-sm text-gray-600 mb-1">Ciudad</label>
-          <input
-            type="text"
-            name="ciudad"
-            value="{{ medico.ciudad }}"
-            class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-[#8BF57A]"
-          >
-        </div>
-
-        <!-- TELÉFONO -->
-        <div>
-          <label class="block text-sm text-gray-600 mb-1">Teléfono</label>
-          <input
-            type="text"
-            name="telefono"
-            value="{{ medico.telefono }}"
-            class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-[#8BF57A]"
-          >
-        </div>
-
-        <!-- EXPERIENCIA -->
-        <div>
-          <label class="block text-sm text-gray-600 mb-1">Años de experiencia</label>
-          <input
-            type="number"
-            name="anios_experiencia"
-            min="0"
-            value="{{ medico.anios_experiencia }}"
-            class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-[#8BF57A]"
-          >
-        </div>
-
-        <!-- UNIVERSIDAD -->
-        <div class="md:col-span-2">
-          <label class="block text-sm text-gray-600 mb-1">Universidad de graduación</label>
-          <input
-            type="text"
-            name="universidad_graduacion"
-            value="{{ medico.universidad_graduacion }}"
-            class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-[#8BF57A]"
-          >
-        </div>
-
+      <div class="mb-8 pb-6 border-b border-gray-100">
+        <h1 class="text-xl font-bold tracking-tight text-[#1F2937]">Editar perfil médico</h1>
+        <p class="text-sm text-gray-500 mt-1">Los cambios se reflejarán en tu perfil público.</p>
       </div>
 
+      <form method="POST" action="{{ url_for('medicos.editar_medico', medico_id=medico.id) }}" class="space-y-10">
 
-      <!-- BIOGRAFÍA -->
-      <div>
-        <label class="block text-sm text-gray-600 mb-1">Biografía</label>
-        <textarea
-          name="biografia"
-          rows="4"
-          class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-[#8BF57A]"
-        >{{ medico.biografia }}</textarea>
-      </div>
+        <!-- Section 1 -->
+        <div>
+          <p class="text-xs font-bold text-gray-300 uppercase tracking-widest mb-5">Datos principales</p>
+          <div class="grid md:grid-cols-2 gap-4">
 
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                Especialidad <span class="text-red-400">*</span>
+              </label>
+              <input type="text" name="especialidad" required value="{{ medico.especialidad }}"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                            focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent focus:bg-white
+                            hover:border-gray-300 transition-all duration-200">
+            </div>
 
-      <!-- BOTONES -->
-      <div class="flex items-center gap-4 pt-2">
+            <!-- Matrícula (read-only) -->
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                Matrícula
+                <span class="ml-1.5 bg-gray-100 text-gray-400 text-[10px] px-1.5 py-0.5 rounded font-mono normal-case">sólo lectura</span>
+              </label>
+              <div class="relative">
+                <input type="text" value="{{ medico.numero_matricula }}" disabled
+                       class="w-full px-4 py-3 border border-gray-100 bg-gray-50 rounded-xl text-sm text-gray-400 cursor-not-allowed font-mono">
+                <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-300">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
 
-        <button
-          type="submit"
-          class="bg-[#8BF57A] text-[#252529] font-medium px-6 py-2.5 rounded-xl hover:opacity-90 transition">
-          Guardar cambios
-        </button>
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Hospital / Clínica</label>
+              <input type="text" name="hospital" value="{{ medico.hospital }}"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                            focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent focus:bg-white
+                            hover:border-gray-300 transition-all duration-200">
+            </div>
 
-        <a
-          href="{{ url_for('medicos.detalle_medico', medico_id=medico.id) }}"
-          class="px-6 py-2.5 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-100 transition">
-          Cancelar
-        </a>
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Ciudad</label>
+              <input type="text" name="ciudad" value="{{ medico.ciudad }}"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                            focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent focus:bg-white
+                            hover:border-gray-300 transition-all duration-200">
+            </div>
 
-      </div>
+          </div>
+        </div>
 
-    </form>
+        <!-- Section 2 -->
+        <div>
+          <p class="text-xs font-bold text-gray-300 uppercase tracking-widest mb-5">Contacto & Experiencia</p>
+          <div class="grid md:grid-cols-2 gap-4">
 
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Teléfono</label>
+              <input type="text" name="telefono" value="{{ medico.telefono }}"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                            focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent focus:bg-white
+                            hover:border-gray-300 transition-all duration-200">
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Años de experiencia</label>
+              <input type="number" name="anios_experiencia" min="0" value="{{ medico.anios_experiencia }}"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                            focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent focus:bg-white
+                            hover:border-gray-300 transition-all duration-200">
+            </div>
+
+            <div class="md:col-span-2 space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Universidad de graduación</label>
+              <input type="text" name="universidad_graduacion" value="{{ medico.universidad_graduacion }}"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                            focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent focus:bg-white
+                            hover:border-gray-300 transition-all duration-200">
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Section 3 -->
+        <div>
+          <p class="text-xs font-bold text-gray-300 uppercase tracking-widest mb-5">Presentación</p>
+          <div class="space-y-1.5">
+            <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Biografía</label>
+            <textarea name="biografia" rows="4"
+                      class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                             focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent focus:bg-white
+                             hover:border-gray-300 transition-all duration-200 resize-none">{{ medico.biografia }}</textarea>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <div class="flex items-center gap-3 pt-2 border-t border-gray-100">
+          <button type="submit"
+                  class="inline-flex items-center gap-2 bg-[#3B82F6] text-white font-semibold text-sm px-6 py-3 rounded-xl
+                         hover:bg-[#60A5FA] hover:scale-[1.02] hover:shadow-[0_4px_16px_rgba(59,130,246,0.24)]
+                         active:scale-[0.98] transition-all duration-200">
+            Guardar cambios
+          </button>
+          <a href="{{ url_for('medicos.detalle_medico', medico_id=medico.id) }}"
+             class="px-5 py-3 rounded-xl border border-gray-200 text-sm font-medium text-gray-500
+                    hover:border-gray-300 hover:bg-gray-50 transition-all duration-200">
+            Cancelar
+          </a>
+        </div>
+
+      </form>
+    </div>
   </div>
 
 </div>

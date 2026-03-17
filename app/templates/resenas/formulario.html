@@ -1,15 +1,150 @@
 {% extends "base.html" %}
-{% block titulo %}Dejar Reseña — MediCerca{% endblock %}
+{% block titulo %}Dejar reseña — MediCerca{% endblock %}
 
 {% block contenido %}
-<!-- DIEGO + MATHI: formulario de reseña -->
 
-<!-- Estructura sugerida:
-  1. Título: "Reseña para Dr. {{ medico.usuario.nombre }}"
-  2. Selector de puntuación 1-5 estrellas (con JS o radio buttons)
-  3. Textarea para comentario (opcional)
-  4. Botón enviar → POST /resenas/agregar/<medico_id>
-  5. Solo visible si el usuario está logueado y no reseñó antes
--->
+<div class="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-16 bg-[#F0F9FF]">
+
+  <div class="w-full max-w-lg animate-slide-up">
+
+    <!-- Back -->
+    <a href="{{ url_for('medicos.detalle_medico', medico_id=medico.id) }}"
+       class="inline-flex items-center gap-1.5 text-xs font-medium text-gray-400 hover:text-[#3B82F6] transition-colors duration-150 mb-6">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Volver al perfil
+    </a>
+
+    <div class="bg-white rounded-2xl border border-gray-100/80 shadow-modal overflow-hidden">
+      <div class="h-0.5 bg-gradient-to-r from-[#3B82F6] to-[#60A5FA]"></div>
+
+      <div class="p-7">
+
+        <!-- Doctor mini profile -->
+        <div class="flex items-center gap-4 mb-7 pb-6 border-b border-gray-100">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#F0F9FF] to-[#60A5FA] flex items-center justify-center text-xl">
+            👨‍⚕️
+          </div>
+          <div>
+            <p class="text-xs font-bold text-gray-300 uppercase tracking-widest mb-0.5">Reseña para</p>
+            <h1 class="font-bold text-[#1F2937] text-lg tracking-tight">{{ medico.usuario.nombre }}</h1>
+            <p class="text-sm text-[#3B82F6] font-medium">{{ medico.especialidad }}</p>
+          </div>
+        </div>
+
+        <form method="POST" action="{{ url_for('resenas.agregar_resena', medico_id=medico.id) }}" class="space-y-6">
+
+          <!-- Star rating -->
+          <div>
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">
+              Puntuación
+            </label>
+
+            <div id="stars" class="flex items-center gap-2" role="group" aria-label="Seleccionar puntuación">
+              {% for i in range(1, 6) %}
+              <button type="button" data-val="{{ i }}"
+                      class="star text-4xl leading-none outline-none transition-all duration-100 hover:scale-125 focus:scale-125 focus-visible:ring-2 focus-visible:ring-[#3B82F6] rounded"
+                      aria-label="{{ i }} estrella{{ 's' if i > 1 else '' }}">
+                ☆
+              </button>
+              {% endfor %}
+            </div>
+
+            <p id="star-label" class="text-sm font-semibold mt-3 h-5 transition-all duration-200"></p>
+            <input type="hidden" id="puntuacion-val" name="puntuacion" value="">
+          </div>
+
+          <!-- Comment -->
+          <div class="space-y-1.5">
+            <label for="comentario" class="block text-xs font-bold text-gray-400 uppercase tracking-widest">
+              Comentario
+              <span class="text-gray-300 ml-1.5 normal-case font-normal text-xs">opcional</span>
+            </label>
+            <textarea id="comentario" name="comentario" rows="4"
+                      placeholder="Contá tu experiencia con el médico..."
+                      class="w-full px-4 py-3.5 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                             focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent focus:bg-white
+                             hover:border-gray-300 transition-all duration-200 resize-none"></textarea>
+            <p class="text-xs text-gray-400">Tu opinión ayuda a otros pacientes a tomar mejores decisiones.</p>
+          </div>
+
+          <!-- Submit -->
+          <button type="submit" id="btn-submit" disabled
+                  class="w-full bg-[#3B82F6] text-white font-bold text-sm py-3.5 rounded-xl
+                         hover:bg-[#60A5FA] hover:scale-[1.02] hover:shadow-[0_4px_16px_rgba(59,130,246,0.24)]
+                         active:scale-[0.98]
+                         disabled:opacity-40 disabled:cursor-not-allowed disabled:scale-100
+                         transition-all duration-200 ease-out">
+            Publicar reseña
+          </button>
+
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const LABELS = { 1: 'Malo', 2: 'Regular', 3: 'Bueno', 4: 'Muy bueno', 5: 'Excelente' };
+  const COLORS = { 1: '#ef4444', 2: '#f97316', 3: '#eab308', 4: '#84cc16', 5: '#22c55e' };
+  const EMOJIS = { 1: '😞', 2: '😕', 3: '😊', 4: '😄', 5: '🤩' };
+
+  const stars  = document.querySelectorAll('.star');
+  const input  = document.getElementById('puntuacion-val');
+  const label  = document.getElementById('star-label');
+  const btn    = document.getElementById('btn-submit');
+  let selected = 0;
+
+  function paint(upTo, color) {
+    stars.forEach((s, i) => {
+      s.textContent = i < upTo ? '★' : '☆';
+      s.style.color = i < upTo ? color : '#d1d5db';
+    });
+  }
+
+  stars.forEach(s => {
+    const v = +s.dataset.val;
+
+    s.addEventListener('mouseenter', () => {
+      paint(v, COLORS[v]);
+      label.textContent = `${EMOJIS[v]} ${LABELS[v]}`;
+      label.style.color = COLORS[v];
+    });
+
+    s.addEventListener('mouseleave', () => {
+      if (selected) {
+        paint(selected, COLORS[selected]);
+        label.textContent = `${EMOJIS[selected]} ${LABELS[selected]}`;
+        label.style.color = COLORS[selected];
+      } else {
+        paint(0, '#d1d5db');
+        label.textContent = '';
+      }
+    });
+
+    s.addEventListener('click', () => {
+      selected = v;
+      input.value = v;
+      btn.disabled = false;
+      paint(v, COLORS[v]);
+      label.textContent = `${EMOJIS[v]} ${LABELS[v]}`;
+      label.style.color = COLORS[v];
+
+      // Cascade bounce
+      stars.forEach((star, i) => {
+        if (i < v) {
+          setTimeout(() => {
+            star.style.transform = 'scale(1.4)';
+            setTimeout(() => star.style.transform = '', 160);
+          }, i * 50);
+        }
+      });
+    });
+  });
+})();
+</script>
 
 {% endblock %}
