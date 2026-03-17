@@ -6,17 +6,59 @@
 {% endblock %}
 
 {% block contenido %}
-<!-- DIEGO + ARTURO: formulario para que el médico ubique su consultorio -->
+<div class="max-w-4xl mx-auto px-4 py-8">
 
-<!-- Estructura sugerida:
-  1. Instrucciones: "Hacé click en el mapa para marcar tu consultorio"
-  2. Div del mapa con id="mapa-selector"
-  3. Inputs hidden: latitud, longitud (se llenan con JS al clickear)
-  4. Input de texto: direccion_consultorio
-  5. Botón guardar → POST /mapa/guardar-ubicacion
--->
+  <!-- Título -->
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold text-gray-800">Seleccioná tu ubicación</h1>
+    <p class="text-gray-500 mt-1">Hacé click en el mapa para marcar tu consultorio</p>
+  </div>
 
+  <!-- Mapa -->
+  <div id="mapa-selector" class="w-full h-[450px] rounded-xl shadow-md z-0 mb-6"></div>
+
+  <!-- Formulario -->
+  <form action="/mapa/guardar-ubicacion" method="POST">
+
+    <!-- Inputs hidden — se llenan con JS -->
+    <input type="hidden" id="latitud"  name="latitud"  value="">
+    <input type="hidden" id="longitud" name="longitud" value="">
+
+    <!-- Dirección -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700 mb-1">
+        Dirección del consultorio
+      </label>
+      <input
+        type="text"
+        name="direccion_consultorio"
+        id="direccion_consultorio"
+        placeholder="Ej: Av. España 123, Asunción"
+        value="{{ medico.direccion_consultorio or '' }}"
+        class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
+    <!-- Coordenadas seleccionadas (feedback visual) -->
+    <p id="coords-texto" class="text-sm text-gray-400 mb-4">
+      Ninguna ubicación seleccionada todavía.
+    </p>
+
+    <!-- Botón guardar -->
+    <button
+      type="submit"
+      id="btn-guardar"
+      disabled
+      class="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-semibold
+             hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
+      Guardar ubicación
+    </button>
+
+  </form>
+
+</div>
 {% endblock %}
+
 
 {% block pie_extra %}
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
