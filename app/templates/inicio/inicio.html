@@ -93,7 +93,8 @@
 
       {% for medico in medicos_recientes %}
 
-      <a href="{{ url_for('medicos.detalle_medico', medico_id=medico.id) }}"
+      <!-- ✅ Endpoint corregido: medicos.detalle -->
+      <a href="{{ url_for('medicos.detalle', medico_id=medico.id) }}"
          class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition block">
 
         <h3 class="text-lg font-semibold mb-1">
