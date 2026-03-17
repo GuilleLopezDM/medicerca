@@ -1,40 +1,296 @@
 {% extends "base.html" %}
-{% block titulo %}<!-- MATHI+DIEGO: nombre del médico -->{% endblock %}
+{% block titulo %}{{ medico.usuario.nombre }} — MediCerca{% endblock %}
 
 {% block contenido %}
-<!-- MATHI + DIEGO: contenido del perfil médico -->
 
-<!-- Estructura sugerida:
+<div class="max-w-6xl mx-auto px-6 py-10">
 
-  === SECCIÓN SUPERIOR: datos del médico ===
-  - Foto, nombre (medico.usuario.nombre), especialidad
-  - Badge "✓ Verificado" si medico.verificado
-  - Matrícula, hospital, ciudad, teléfono
-  - Universidad de graduación 🎓
-  - Años de experiencia
-  - Botón "Editar" si es el dueño
-  - Botón "Ver en mapa" si medico.latitud → url_for('mapa.mapa_medicos') + anchor al marcador
-  - Dirección del consultorio si medico.direccion_consultorio
+  <!-- CABECERA DEL MÉDICO -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
 
-  === SECCIÓN RATING ===
-  - Estrellas promedio: medico.calificacion_promedio (★★★★☆)
-  - Total de reseñas: medico.total_resenas
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
 
-  === SECCIÓN RESEÑAS ===
-  - Formulario de nueva reseña (solo si current_user.is_authenticated
-    y el usuario NO es el propio médico
-    y el usuario NO reseñó antes)
-    → POST a url_for('resenas.agregar_resena', medico_id=medico.id)
-    → Campos: puntuacion (1-5 estrellas), comentario
+      <div class="flex items-center gap-5">
 
-  - Lista de reseñas existentes:
-    {% for resena in medico.resenas %}
-      - Nombre del autor: resena.autor.nombre
-      - Puntuación: resena.puntuacion estrellas
-      - Comentario: resena.comentario
-      - Fecha: resena.creado_en
-      - Botón editar/eliminar si resena.usuario_id == current_user.id
-    {% endfor %}
--->
+        <!-- AVATAR -->
+        <div class="w-20 h-20 rounded-full bg-[#cbe4fe] flex items-center justify-center text-3xl">
+          👨‍⚕️
+        </div>
+
+        <!-- INFO PRINCIPAL -->
+        <div>
+
+          <div class="flex items-center gap-3">
+            <h1 class="text-2xl font-bold text-[#252529]">
+              {{ medico.usuario.nombre }}
+            </h1>
+
+            {% if medico.verificado %}
+            <span class="text-xs bg-[#97D663] text-white px-2 py-1 rounded">
+              ✓ Verificado
+            </span>
+            {% endif %}
+          </div>
+
+          <p class="text-[#205ea6] font-medium">
+            {{ medico.especialidad }}
+          </p>
+
+          {% if medico.hospital %}
+          <p class="text-gray-600 text-sm">
+            {{ medico.hospital }}
+          </p>
+          {% endif %}
+
+        </div>
+
+      </div>
+
+
+      <!-- BOTONES -->
+      <div class="flex gap-3">
+
+        {% if current_user.is_authenticated and current_user.id == medico.usuario_id %}
+        <a
+          href="{{ url_for('medicos.editar_medico', medico_id=medico.id) }}"
+          class="px-4 py-2 rounded-xl bg-[#8BF57A] text-[#252529] font-medium hover:opacity-90 transition">
+          Editar
+        </a>
+        {% endif %}
+
+        {% if medico.latitud %}
+        <a
+          href="{{ url_for('mapa.mapa_medicos') }}#medico-{{ medico.id }}"
+          class="px-4 py-2 rounded-xl border border-gray-300 hover:bg-gray-100 transition">
+          Ver en mapa
+        </a>
+        {% endif %}
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- DATOS DEL MÉDICO -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
+
+    <h2 class="text-xl font-semibold mb-4">
+      Información profesional
+    </h2>
+
+    <div class="grid md:grid-cols-2 gap-4 text-sm">
+
+      <div>
+        <span class="text-gray-500">Matrícula</span>
+        <p class="font-medium">{{ medico.numero_matricula }}</p>
+      </div>
+
+      {% if medico.ciudad %}
+      <div>
+        <span class="text-gray-500">Ciudad</span>
+        <p class="font-medium">{{ medico.ciudad }}</p>
+      </div>
+      {% endif %}
+
+      {% if medico.anios_experiencia %}
+      <div>
+        <span class="text-gray-500">Experiencia</span>
+        <p class="font-medium">{{ medico.anios_experiencia }} años</p>
+      </div>
+      {% endif %}
+
+      {% if medico.telefono %}
+      <div>
+        <span class="text-gray-500">Teléfono</span>
+        <p class="font-medium">{{ medico.telefono }}</p>
+      </div>
+      {% endif %}
+
+      {% if medico.universidad_graduacion %}
+      <div class="md:col-span-2">
+        <span class="text-gray-500">Universidad</span>
+        <p class="font-medium">
+          🎓 {{ medico.universidad_graduacion }}
+        </p>
+      </div>
+      {% endif %}
+
+      {% if medico.direccion_consultorio %}
+      <div class="md:col-span-2">
+        <span class="text-gray-500">Consultorio</span>
+        <p class="font-medium">
+          {{ medico.direccion_consultorio }}
+        </p>
+      </div>
+      {% endif %}
+
+    </div>
+
+  </div>
+
+
+
+  <!-- BIOGRAFÍA -->
+  {% if medico.biografia %}
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
+
+    <h2 class="text-xl font-semibold mb-4">
+      Sobre el médico
+    </h2>
+
+    <p class="text-gray-700 leading-relaxed">
+      {{ medico.biografia }}
+    </p>
+
+  </div>
+  {% endif %}
+
+
+
+  <!-- RATING -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
+
+    <h2 class="text-xl font-semibold mb-4">
+      Calificación
+    </h2>
+
+    <div class="flex items-center gap-4">
+
+      <div class="text-yellow-500 text-xl">
+        {{ medico.calificacion_promedio or "☆☆☆☆☆" }}
+      </div>
+
+      <div class="text-gray-600 text-sm">
+        {{ medico.total_resenas or 0 }} reseña(s)
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- RESEÑAS -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+
+    <h2 class="text-xl font-semibold mb-6">
+      Reseñas
+    </h2>
+
+
+    <!-- FORM NUEVA RESEÑA -->
+    {% if current_user.is_authenticated and current_user.id != medico.usuario_id %}
+
+    <form
+      method="POST"
+      action="{{ url_for('resenas.agregar_resena', medico_id=medico.id) }}"
+      class="mb-8 space-y-4">
+
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">
+          Puntuación
+        </label>
+
+        <select
+          name="puntuacion"
+          class="border border-gray-300 rounded-lg px-3 py-2">
+
+          <option value="5">★★★★★</option>
+          <option value="4">★★★★</option>
+          <option value="3">★★★</option>
+          <option value="2">★★</option>
+          <option value="1">★</option>
+
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">
+          Comentario
+        </label>
+
+        <textarea
+          name="comentario"
+          rows="3"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2"></textarea>
+      </div>
+
+      <button
+        type="submit"
+        class="bg-[#8BF57A] text-[#252529] px-5 py-2 rounded-xl font-medium hover:opacity-90 transition">
+        Publicar reseña
+      </button>
+
+    </form>
+
+    {% endif %}
+
+
+
+    <!-- LISTA DE RESEÑAS -->
+    <div class="space-y-6">
+
+      {% for resena in medico.resenas %}
+
+      <div class="border-t pt-4">
+
+        <div class="flex items-center justify-between">
+
+          <div class="font-medium">
+            {{ resena.autor.nombre }}
+          </div>
+
+          <div class="text-yellow-500 text-sm">
+            {{ "★" * resena.puntuacion }}
+          </div>
+
+        </div>
+
+        <p class="text-gray-700 mt-2">
+          {{ resena.comentario }}
+        </p>
+
+        <p class="text-xs text-gray-400 mt-1">
+          {{ resena.creado_en }}
+        </p>
+
+        {% if current_user.is_authenticated and resena.usuario_id == current_user.id %}
+
+        <div class="mt-2 flex gap-3 text-sm">
+
+          <a
+            href="#"
+            class="text-[#205ea6] hover:underline">
+            Editar
+          </a>
+
+          <a
+            href="#"
+            class="text-[#ee6e6e] hover:underline">
+            Eliminar
+          </a>
+
+        </div>
+
+        {% endif %}
+
+      </div>
+
+      {% else %}
+
+      <p class="text-gray-500">
+        Aún no hay reseñas para este médico.
+      </p>
+
+      {% endfor %}
+
+    </div>
+
+  </div>
+
+</div>
 
 {% endblock %}

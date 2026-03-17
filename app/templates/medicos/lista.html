@@ -3,32 +3,205 @@
 
 {% block contenido %}
 
-{# TODO (Diego) — FEATURE 8: Directorio de médicos con filtros
-   Título: "Directorio de Médicos"
+<div class="max-w-7xl mx-auto px-6 py-10">
 
-   Formulario de filtros (method GET):
-     - busqueda: input text, name="busqueda", valor actual: {{ filtros_actuales.busqueda }}
-     - especialidad: select, name="especialidad", opciones desde {{ especialidades }}
-     - ciudad: select, name="ciudad", opciones desde {{ ciudades }}
-     - universidad: select, name="universidad", opciones desde {{ universidades }}
-     - verificados: checkbox, name="verificados", value="1"
-     - Botón "Filtrar"
-   Los selects deben pre-seleccionar el valor actual usando filtros_actuales.
+  <!-- TÍTULO -->
+  <h1 class="text-3xl font-bold text-[#252529] mb-8">
+    Directorio de Médicos
+  </h1>
 
-   Contador: "{{ total }} resultado(s) encontrado(s)"
 
-   Grilla de cards (loop: {% for medico in medicos %}):
-     Cada card muestra:
-       - medico.usuario.nombre
-       - medico.especialidad
-       - medico.numero_matricula
-       - medico.hospital (si existe)
-       - medico.ciudad (si existe)
-       - medico.universidad_graduacion (si existe, con 🎓)
-       - Badge "✓ Verificado" si medico.verificado es True
-     La card linkea a: url_for('medicos.detalle_medico', medico_id=medico.id)
+  <!-- FILTROS -->
+  <form method="GET" action="{{ url_for('medicos.lista_medicos') }}"
+        class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-8">
 
-   Si no hay médicos: mostrar mensaje con ícono 🔍
-#}
+    <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
+
+      <!-- BUSQUEDA -->
+      <div>
+        <label class="text-sm font-medium text-gray-700">Buscar</label>
+        <input
+          type="text"
+          name="busqueda"
+          value="{{ filtros_actuales.busqueda }}"
+          placeholder="Nombre o especialidad"
+          class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#8BF57A] focus:border-[#8BF57A]"
+        >
+      </div>
+
+
+      <!-- ESPECIALIDAD -->
+      <div>
+        <label class="text-sm font-medium text-gray-700">Especialidad</label>
+
+        <select
+          name="especialidad"
+          class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#8BF57A]">
+
+          <option value="">Todas</option>
+
+          {% for esp in especialidades %}
+          <option
+            value="{{ esp }}"
+            {% if filtros_actuales.especialidad == esp %}selected{% endif %}
+          >
+            {{ esp }}
+          </option>
+          {% endfor %}
+
+        </select>
+      </div>
+
+
+      <!-- CIUDAD -->
+      <div>
+        <label class="text-sm font-medium text-gray-700">Ciudad</label>
+
+        <select
+          name="ciudad"
+          class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#8BF57A]">
+
+          <option value="">Todas</option>
+
+          {% for c in ciudades %}
+          <option
+            value="{{ c }}"
+            {% if filtros_actuales.ciudad == c %}selected{% endif %}
+          >
+            {{ c }}
+          </option>
+          {% endfor %}
+
+        </select>
+      </div>
+
+
+      <!-- UNIVERSIDAD -->
+      <div>
+        <label class="text-sm font-medium text-gray-700">Universidad</label>
+
+        <select
+          name="universidad"
+          class="w-full mt-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#8BF57A]">
+
+          <option value="">Todas</option>
+
+          {% for u in universidades %}
+          <option
+            value="{{ u }}"
+            {% if filtros_actuales.universidad == u %}selected{% endif %}
+          >
+            {{ u }}
+          </option>
+          {% endfor %}
+
+        </select>
+      </div>
+
+
+      <!-- VERIFICADOS -->
+      <div class="flex items-end">
+        <label class="flex items-center gap-2 text-sm text-gray-700">
+
+          <input
+            type="checkbox"
+            name="verificados"
+            value="1"
+            {% if filtros_actuales.verificados %}checked{% endif %}
+            class="h-4 w-4 text-[#8BF57A] border-gray-300 rounded"
+          >
+
+          Solo verificados
+        </label>
+      </div>
+
+    </div>
+
+
+    <!-- BOTÓN FILTRAR -->
+    <div class="mt-6">
+      <button
+        type="submit"
+        class="bg-[#8BF57A] hover:opacity-90 text-[#252529] font-medium px-6 py-2 rounded-xl transition">
+        Filtrar
+      </button>
+    </div>
+
+  </form>
+
+
+
+  <!-- CONTADOR -->
+  <p class="text-gray-600 mb-6">
+    {{ total }} resultado(s) encontrado(s)
+  </p>
+
+
+
+  <!-- LISTA DE MÉDICOS -->
+  {% if medicos %}
+
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+    {% for medico in medicos %}
+
+    <a
+      href="{{ url_for('medicos.detalle_medico', medico_id=medico.id) }}"
+      class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition block">
+
+      <h3 class="text-lg font-semibold text-[#252529]">
+        {{ medico.usuario.nombre }}
+      </h3>
+
+      <p class="text-sm text-[#205ea6] font-medium">
+        {{ medico.especialidad }}
+      </p>
+
+      <p class="text-sm text-gray-600 mt-1">
+        Matrícula: {{ medico.numero_matricula }}
+      </p>
+
+      {% if medico.hospital %}
+      <p class="text-sm text-gray-600">
+        {{ medico.hospital }}
+      </p>
+      {% endif %}
+
+      {% if medico.ciudad %}
+      <p class="text-sm text-gray-600">
+        {{ medico.ciudad }}
+      </p>
+      {% endif %}
+
+      {% if medico.universidad_graduacion %}
+      <p class="text-sm text-gray-600 mt-2">
+        🎓 {{ medico.universidad_graduacion }}
+      </p>
+      {% endif %}
+
+      {% if medico.verificado %}
+      <span class="inline-block mt-3 text-xs bg-[#97D663] text-white px-2 py-1 rounded">
+        ✓ Verificado
+      </span>
+      {% endif %}
+
+    </a>
+
+    {% endfor %}
+
+  </div>
+
+
+  {% else %}
+
+  <!-- SIN RESULTADOS -->
+  <div class="bg-white rounded-2xl p-10 text-center text-gray-500 border border-gray-200">
+    <div class="text-4xl mb-4">🔍</div>
+    <p>No se encontraron médicos con esos filtros.</p>
+  </div>
+
+  {% endif %}
+
+</div>
 
 {% endblock %}

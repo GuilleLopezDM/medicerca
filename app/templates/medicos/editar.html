@@ -3,21 +3,139 @@
 
 {% block contenido %}
 
-{# TODO (Diego) — FEATURE 11: Formulario de edición
-   Igual al de registrar pero con los valores actuales pre-cargados.
-   Form: method POST, action url_for('medicos.editar_medico', medico_id=medico.id)
+<div class="max-w-4xl mx-auto px-6 py-10">
 
-   Campos editables (pre-cargar con medico.campo):
-     - especialidad, hospital, ciudad, telefono, anios_experiencia
-     - universidad_graduacion
-     - biografia (textarea)
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
 
-   Campo NO editable (disabled):
-     - numero_matricula → mostrar con fondo gris y nota "La matrícula no puede modificarse."
+    <!-- TÍTULO -->
+    <h1 class="text-2xl font-bold text-[#252529] mb-6">
+      Editar Perfil Médico
+    </h1>
 
-   Botones:
-     - "Guardar cambios" (submit)
-     - "Cancelar" → link a medicos.detalle_medico
-#}
+    <form method="POST"
+          action="{{ url_for('medicos.editar_medico', medico_id=medico.id) }}"
+          class="space-y-6">
+
+      <!-- GRILLA -->
+      <div class="grid md:grid-cols-2 gap-5">
+
+        <!-- ESPECIALIDAD -->
+        <div>
+          <label class="block text-sm text-gray-600 mb-1">Especialidad</label>
+          <input
+            type="text"
+            name="especialidad"
+            value="{{ medico.especialidad }}"
+            required
+            class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-[#8BF57A] focus:border-[#8BF57A]"
+          >
+        </div>
+
+        <!-- MATRÍCULA (NO EDITABLE) -->
+        <div>
+          <label class="block text-sm text-gray-600 mb-1">Número de matrícula</label>
+          <input
+            type="text"
+            value="{{ medico.numero_matricula }}"
+            disabled
+            class="w-full border border-gray-200 bg-gray-100 rounded-xl px-4 py-2 text-gray-500 cursor-not-allowed"
+          >
+          <p class="text-xs text-gray-400 mt-1">
+            La matrícula no puede modificarse.
+          </p>
+        </div>
+
+        <!-- HOSPITAL -->
+        <div>
+          <label class="block text-sm text-gray-600 mb-1">Hospital / Clínica</label>
+          <input
+            type="text"
+            name="hospital"
+            value="{{ medico.hospital }}"
+            class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-[#8BF57A]"
+          >
+        </div>
+
+        <!-- CIUDAD -->
+        <div>
+          <label class="block text-sm text-gray-600 mb-1">Ciudad</label>
+          <input
+            type="text"
+            name="ciudad"
+            value="{{ medico.ciudad }}"
+            class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-[#8BF57A]"
+          >
+        </div>
+
+        <!-- TELÉFONO -->
+        <div>
+          <label class="block text-sm text-gray-600 mb-1">Teléfono</label>
+          <input
+            type="text"
+            name="telefono"
+            value="{{ medico.telefono }}"
+            class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-[#8BF57A]"
+          >
+        </div>
+
+        <!-- EXPERIENCIA -->
+        <div>
+          <label class="block text-sm text-gray-600 mb-1">Años de experiencia</label>
+          <input
+            type="number"
+            name="anios_experiencia"
+            min="0"
+            value="{{ medico.anios_experiencia }}"
+            class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-[#8BF57A]"
+          >
+        </div>
+
+        <!-- UNIVERSIDAD -->
+        <div class="md:col-span-2">
+          <label class="block text-sm text-gray-600 mb-1">Universidad de graduación</label>
+          <input
+            type="text"
+            name="universidad_graduacion"
+            value="{{ medico.universidad_graduacion }}"
+            class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-[#8BF57A]"
+          >
+        </div>
+
+      </div>
+
+
+      <!-- BIOGRAFÍA -->
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">Biografía</label>
+        <textarea
+          name="biografia"
+          rows="4"
+          class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-[#8BF57A]"
+        >{{ medico.biografia }}</textarea>
+      </div>
+
+
+      <!-- BOTONES -->
+      <div class="flex items-center gap-4 pt-2">
+
+        <button
+          type="submit"
+          class="bg-[#8BF57A] text-[#252529] font-medium px-6 py-2.5 rounded-xl hover:opacity-90 transition">
+          Guardar cambios
+        </button>
+
+        <a
+          href="{{ url_for('medicos.detalle_medico', medico_id=medico.id) }}"
+          class="px-6 py-2.5 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-100 transition">
+          Cancelar
+        </a>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
 
 {% endblock %}

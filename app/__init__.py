@@ -29,8 +29,14 @@ def crear_app():
 
     from app.rutas.autenticacion import bp_autenticacion
     app.register_blueprint(bp_autenticacion)
+
     from app.rutas.principal import bp_principal       # Arturo - Feature 1 y 2
     app.register_blueprint(bp_principal)
+
+    # ✅ Registrar blueprint de médicos (faltaba)
+    from app.rutas.medicos import bp_medicos
+    app.register_blueprint(bp_medicos)
+
     from app.rutas.mapa import bp_mapa                 # Arturo - Features 3, 4 y 5
     app.register_blueprint(bp_mapa, url_prefix="/mapa")
     # from app.rutas.busqueda import bp_busqueda          # Hugo
