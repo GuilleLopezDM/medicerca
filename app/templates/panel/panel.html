@@ -3,18 +3,98 @@
 
 {% block contenido %}
 
-{# TODO (Diego) — FEATURE 12: Panel del usuario
-   Saludo: "Bienvenido, {{ current_user.nombre }}"
+<div class="max-w-5xl mx-auto px-6 py-10">
 
-   Si current_user.rol == 'medico':
-     Si current_user.perfil_medico existe:
-       - Tarjeta con especialidad, botones "Ver perfil" y "Editar"
-     Si NO tiene perfil:
-       - Tarjeta destacada: "¡Creá tu perfil médico!"
-       - Botón → medicos.registrar_medico
+  <!-- SALUDO -->
+  <h1 class="text-3xl font-bold text-[#252529] mb-8">
+    Bienvenido, {{ current_user.nombre }}
+  </h1>
 
-   Tarjeta siempre visible:
-     - "Directorio" con botón → medicos.lista_medicos
-#}
+
+  <div class="grid md:grid-cols-2 gap-6">
+
+    <!-- SECCIÓN MÉDICO -->
+    {% if current_user.rol == 'medico' %}
+
+      {% if current_user.perfil_medico %}
+
+      <!-- TIENE PERFIL -->
+      <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+
+        <h2 class="text-xl font-semibold mb-2">
+          Tu perfil médico
+        </h2>
+
+        <p class="text-[#205ea6] font-medium mb-4">
+          {{ current_user.perfil_medico.especialidad }}
+        </p>
+
+        <div class="flex gap-3">
+
+          <a
+            href="{{ url_for('medicos.detalle_medico', medico_id=current_user.perfil_medico.id) }}"
+            class="px-4 py-2 rounded-xl bg-[#8BF57A] text-[#252529] font-medium hover:opacity-90 transition">
+            Ver perfil
+          </a>
+
+          <a
+            href="{{ url_for('medicos.editar_medico', medico_id=current_user.perfil_medico.id) }}"
+            class="px-4 py-2 rounded-xl border border-gray-300 hover:bg-gray-100 transition">
+            Editar
+          </a>
+
+        </div>
+
+      </div>
+
+      {% else %}
+
+      <!-- NO TIENE PERFIL -->
+      <div class="bg-[#cbe4fe] p-6 rounded-2xl border border-blue-100 shadow-sm">
+
+        <h2 class="text-xl font-semibold mb-2">
+          ¡Creá tu perfil médico!
+        </h2>
+
+        <p class="text-gray-700 mb-4">
+          Completá tu información para aparecer en el directorio y recibir pacientes.
+        </p>
+
+        <a
+          href="{{ url_for('medicos.registrar_medico') }}"
+          class="inline-block bg-[#8BF57A] text-[#252529] px-5 py-2 rounded-xl font-medium hover:opacity-90 transition">
+          Crear perfil
+        </a>
+
+      </div>
+
+      {% endif %}
+
+    {% endif %}
+
+
+
+    <!-- DIRECTORIO (SIEMPRE VISIBLE) -->
+    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+
+      <h2 class="text-xl font-semibold mb-2">
+        Directorio de médicos
+      </h2>
+
+      <p class="text-gray-600 mb-4">
+        Explorá médicos por especialidad, ubicación y más.
+      </p>
+
+      <a
+        href="{{ url_for('medicos.lista_medicos') }}"
+        class="inline-block bg-[#8BF57A] text-[#252529] px-5 py-2 rounded-xl font-medium hover:opacity-90 transition">
+        Ver directorio
+      </a>
+
+    </div>
+
+  </div>
+
+</div>
 
 {% endblock %}

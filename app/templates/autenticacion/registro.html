@@ -3,16 +3,108 @@
 
 {% block contenido %}
 
-{# TODO (Diego) — FEATURE 7: Formulario de registro
-   Centrado en la pantalla, tarjeta blanca con sombra suave.
-   Form: method POST, action url_for('autenticacion.registro')
-   Campos:
-     - nombre (type text, name="nombre")
-     - correo (type email, name="correo")
-     - contrasena (type password, name="contrasena")
-     - rol (select, name="rol") con opciones: paciente / medico
-   Botón: "Crear cuenta"
-   Link abajo: "¿Ya tenés cuenta? Iniciá sesión" → autenticacion.iniciar_sesion
-#}
+<div class="min-h-screen flex items-center justify-center bg-[#F2F2F2] px-4">
+
+  <div class="w-full max-w-md bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
+
+    <h1 class="text-3xl font-bold text-center text-[#252529] mb-2">
+      Crear cuenta
+    </h1>
+
+    <p class="text-gray-500 text-center mb-6">
+      Registrate en MediCerca
+    </p>
+
+    <form method="POST" action="{{ url_for('autenticacion.registro') }}" class="space-y-5">
+
+      <!-- NOMBRE -->
+      <div>
+        <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">
+          Nombre
+        </label>
+
+        <input
+          type="text"
+          id="nombre"
+          name="nombre"
+          required
+          placeholder="Tu nombre completo"
+          class="w-full rounded-xl border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#8BF57A] focus:border-[#8BF57A]"
+        >
+      </div>
+
+      <!-- CORREO -->
+      <div>
+        <label for="correo" class="block text-sm font-medium text-gray-700 mb-1">
+          Correo electrónico
+        </label>
+
+        <input
+          type="email"
+          id="correo"
+          name="correo"
+          required
+          placeholder="correo@ejemplo.com"
+          class="w-full rounded-xl border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#8BF57A] focus:border-[#8BF57A]"
+        >
+      </div>
+
+      <!-- CONTRASEÑA -->
+      <div>
+        <label for="contrasena" class="block text-sm font-medium text-gray-700 mb-1">
+          Contraseña
+        </label>
+
+        <input
+          type="password"
+          id="contrasena"
+          name="contrasena"
+          required
+          placeholder="********"
+          class="w-full rounded-xl border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#8BF57A] focus:border-[#8BF57A]"
+        >
+      </div>
+
+      <!-- ROL -->
+      <div>
+        <label for="rol" class="block text-sm font-medium text-gray-700 mb-1">
+          Tipo de cuenta
+        </label>
+
+        <select
+          id="rol"
+          name="rol"
+          required
+          class="w-full rounded-xl border border-gray-300 px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#8BF57A] focus:border-[#8BF57A]"
+        >
+          <option value="paciente">Paciente</option>
+          <option value="medico">Médico</option>
+        </select>
+      </div>
+
+      <!-- BOTÓN -->
+      <button
+        type="submit"
+        class="w-full bg-[#8BF57A] hover:opacity-90 text-[#252529] font-semibold py-2.5 rounded-xl transition"
+      >
+        Crear cuenta
+      </button>
+
+    </form>
+
+    <!-- LINK LOGIN -->
+    <p class="text-sm text-center text-gray-600 mt-6">
+      ¿Ya tenés cuenta?
+      <a
+        href="{{ url_for('autenticacion.iniciar_sesion') }}"
+        class="font-medium text-[#205ea6] hover:underline"
+      >
+        Iniciá sesión
+      </a>
+    </p>
+
+  </div>
+
+</div>
 
 {% endblock %}

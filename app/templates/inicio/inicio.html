@@ -3,29 +3,147 @@
 
 {% block contenido %}
 
-{# TODO (Diego) — FEATURE 3: Sección Hero
-   - Fondo degradado verde esmeralda
-   - Título grande: "Encontrá tu médico de confianza"
-   - Subtítulo descriptivo
-   - Formulario de búsqueda que apunta a: url_for('medicos.lista_medicos') method GET
-     con un input name="busqueda" y botón de buscar
-#}
+<!-- HERO -->
+<section class="bg-gradient-to-r from-[#8BF57A] to-[#7af5c0] text-[#252529]">
+  <div class="max-w-6xl mx-auto px-6 py-20 text-center">
+
+    <h1 class="text-4xl md:text-5xl font-bold mb-6">
+      Encontrá tu médico de confianza
+    </h1>
+
+    <p class="text-lg mb-10 max-w-2xl mx-auto">
+      MediCerca te ayuda a descubrir médicos verificados cerca tuyo.
+      Revisá sus credenciales, experiencia y lugar de atención.
+    </p>
+
+    <!-- BUSCADOR -->
+    <form action="{{ url_for('medicos.lista_medicos') }}" method="GET"
+          class="max-w-xl mx-auto flex bg-white rounded-xl shadow-md overflow-hidden">
+
+      <input
+        type="text"
+        name="busqueda"
+        placeholder="Buscar por nombre, especialidad o ciudad..."
+        class="flex-grow px-4 py-3 outline-none"
+      >
+
+      <button
+        type="submit"
+        class="bg-[#205ea6] text-white px-6 hover:opacity-90 transition">
+        Buscar
+      </button>
+
+    </form>
+
+  </div>
+</section>
 
 
-{# TODO (Diego) — FEATURE 4: Sección de estadísticas
-   - 3 columnas: total_medicos registrados / +20 especialidades / 100% verificados
-   - Usar la variable {{ total_medicos }} que viene desde principal.inicio
-#}
+
+<!-- ESTADÍSTICAS -->
+<section class="max-w-6xl mx-auto px-6 py-14">
+
+  <div class="grid md:grid-cols-3 gap-6 text-center">
+
+    <div class="bg-white p-6 rounded-xl shadow-sm">
+      <p class="text-3xl font-bold text-[#205ea6]">
+        {{ total_medicos }}
+      </p>
+      <p class="text-gray-600 mt-2">
+        Médicos registrados
+      </p>
+    </div>
+
+    <div class="bg-white p-6 rounded-xl shadow-sm">
+      <p class="text-3xl font-bold text-[#205ea6]">
+        +20
+      </p>
+      <p class="text-gray-600 mt-2">
+        Especialidades médicas
+      </p>
+    </div>
+
+    <div class="bg-white p-6 rounded-xl shadow-sm">
+      <p class="text-3xl font-bold text-[#205ea6]">
+        100%
+      </p>
+      <p class="text-gray-600 mt-2">
+        Médicos verificados
+      </p>
+    </div>
+
+  </div>
+
+</section>
 
 
-{# TODO (Diego) — FEATURE 5: Grilla de médicos recientes
-   - Título "Médicos recientes"
-   - Loop: {% for medico in medicos_recientes %}
-   - Cada card muestra: medico.usuario.nombre, medico.especialidad,
-     medico.hospital, medico.ciudad, medico.universidad_graduacion, medico.anios_experiencia
-   - La card linkea a: url_for('medicos.detalle_medico', medico_id=medico.id)
-   - Si no hay médicos: mostrar mensaje "Aún no hay médicos registrados."
-   - Botón al final: "Ver todos los médicos →" → url_for('medicos.lista_medicos')
-#}
+
+<!-- MÉDICOS RECIENTES -->
+<section class="max-w-6xl mx-auto px-6 pb-20">
+
+  <div class="flex justify-between items-center mb-8">
+    <h2 class="text-2xl font-bold">
+      Médicos recientes
+    </h2>
+  </div>
+
+  {% if medicos_recientes %}
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      {% for medico in medicos_recientes %}
+
+      <a href="{{ url_for('medicos.detalle_medico', medico_id=medico.id) }}"
+         class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition block">
+
+        <h3 class="text-lg font-semibold mb-1">
+          {{ medico.usuario.nombre }}
+        </h3>
+
+        <p class="text-sm text-[#205ea6] mb-2">
+          {{ medico.especialidad }}
+        </p>
+
+        <p class="text-sm text-gray-600">
+          {{ medico.hospital }} — {{ medico.ciudad }}
+        </p>
+
+        <p class="text-sm text-gray-500 mt-2">
+          {{ medico.universidad_graduacion }}
+        </p>
+
+        <p class="text-sm text-gray-500">
+          {{ medico.anios_experiencia }} años de experiencia
+        </p>
+
+        {% if medico.verificado %}
+        <span class="inline-block mt-3 text-xs px-2 py-1 rounded bg-[#97D663] text-white">
+          Verificado
+        </span>
+        {% endif %}
+
+      </a>
+
+      {% endfor %}
+
+    </div>
+
+  {% else %}
+
+    <div class="bg-white p-10 rounded-xl text-center text-gray-500">
+      Aún no hay médicos registrados.
+    </div>
+
+  {% endif %}
+
+  <!-- BOTÓN VER TODOS -->
+  <div class="text-center mt-10">
+    <a href="{{ url_for('medicos.lista_medicos') }}"
+       class="inline-block bg-[#8BF57A] px-6 py-3 rounded-lg font-medium hover:opacity-90 transition">
+       Ver todos los médicos →
+    </a>
+  </div>
+
+</section>
 
 {% endblock %}
