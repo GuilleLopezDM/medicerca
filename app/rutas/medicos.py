@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
 from flask_login import login_required, current_user
 from app import bd
 from app.models import Medico, Usuario
@@ -17,8 +17,6 @@ def lista_medicos():
     universidad = request.args.get('universidad')
     verificados = request.args.get('verificados')
 
-    # Aplicación de lógica de filtros (ILIKE para ignorar mayúsculas)
-
     # Feature 1 — Búsqueda general
     if busqueda:
         query = query.filter(
@@ -27,7 +25,7 @@ def lista_medicos():
             (Medico.hospital.ilike(f"%{busqueda}%"))
         )
 
-    # Feature 2 (Marcelo)— Filtro por especialidad
+    # Feature 2 — Filtro por especialidad
     if especialidad:
         query = query.filter(Medico.especialidad.ilike(f"%{especialidad}%"))
 
@@ -42,8 +40,6 @@ def lista_medicos():
 
     medicos = query.all()
 
-    # Datos para llenar los selects del buscador en el template
-    # Usamos db.session.query(distintos) para no repetir opciones en los filtros
     especialidades = bd.session.query(Medico.especialidad).distinct().all()
     ciudades = bd.session.query(Medico.ciudad).distinct().all()
 
@@ -59,20 +55,20 @@ def lista_medicos():
 #F2 detalle de un medico
 @bp_medicos.route("/<int:medico_id>")
 def detalle(medico_id):
-    medico = Medico.query.get_or_404(medico_id)
+    medico = bd.session.get(Medico, medico_id)
+    if not medico:
+        abort(404)
     return render_template("medicos/detalle.html", medico=medico)
 
 #F3 Formulario de registro medico — FEATURE 4: Guardar perfil médico
 @bp_medicos.route("/registrar", methods=["GET", "POST"])
 @login_required
 def registrar():
-    # Seguridad de Rol
     if current_user.rol != 'medico':
         flash("Solo usuarios con rol 'médico' pueden crear un perfil profesional.", "warning")
         return redirect(url_for('principal.inicio'))
     
-    # Evitar perfiles duplicados
-    if current_user.perfil_medico: # Asumiendo relación backref en Usuario
+    if current_user.perfil_medico:
         return redirect(url_for('medicos.detalle', medico_id=current_user.perfil_medico.id))
 
     if request.method == "POST":
@@ -94,14 +90,14 @@ def registrar():
 
     return render_template("medicos/registrar.html")
 
-
-# TODO (Mathi) — FEATURE 5: Formulario de edición - FEATURE 6: Guardar edición
+# TODO — FEATURE 5/6: Editar perfil
 @bp_medicos.route("/editar/<int:medico_id>", methods=["GET", "POST"])
 @login_required
 def editar(medico_id):
-    medico = Medico.query.get_or_404(medico_id)
+    medico = bd.session.get(Medico, medico_id)
+    if not medico:
+        abort(404)
 
-    # Seguridad: Solo dueño o Admin
     if medico.usuario_id != current_user.id and current_user.rol != 'admin':
         flash("No tienes permiso para editar este perfil.", "danger")
         return redirect(url_for('medicos.detalle', medico_id=medico.id))
@@ -114,8 +110,7 @@ def editar(medico_id):
         medico.biografia = request.form.get('biografia')
         medico.universidad_graduacion = request.form.get('universidad_graduacion')
         medico.anios_experiencia = request.form.get('anios_experiencia', type=int)
-        medico.numero_matricula = request.form.get('Numero de Matricula')
-        
+        medico.numero_matricula = request.form.get('numero_matricula')
         
         bd.session.commit()
         flash("Perfil actualizado correctamente.", "success")
@@ -123,13 +118,9 @@ def editar(medico_id):
 
     return render_template("medicos/editar.html", medico=medico)
 
-
 # --- FEATURE 5: MAPA DE MÉDICOS ---
-
-
 @bp_medicos.route("/mapa")
 def mapa_medicos():
-    # Filtramos médicos que tengan coordenadas
     medicos_geolocalizados = Medico.query.filter(
         Medico.latitud.isnot(None), 
         Medico.longitud.isnot(None)

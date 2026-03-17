@@ -1,9 +1,4 @@
-# ============================================================
-#  ARTURO + DIEGO — app/rutas/mapa.py
-#  Tu tarea: rutas del mapa de médicos con Leaflet.js
-# ============================================================
-
-from flask import Blueprint, render_template, jsonify, request, flash, redirect, url_for
+from flask import Blueprint, render_template, jsonify, request, flash, redirect, url_for, abort
 from flask_login import login_required, current_user
 from app import bd
 from app.models.models import Medico
@@ -11,13 +6,11 @@ from app.models.models import Medico
 bp_mapa = Blueprint("mapa", __name__)
 
 
-# --- FEATURE 1: PÁGINA DEL MAPA ---
 @bp_mapa.route("/")
 def mapa_medicos():
     return render_template("mapa/mapa.html")
 
 
-# --- FEATURE 2: API DE MÉDICOS PARA EL MAPA ---
 @bp_mapa.route("/medicos.json")
 def medicos_json():
     medicos = Medico.query.filter(Medico.latitud.isnot(None)).all()
@@ -42,18 +35,21 @@ def medicos_json():
     return jsonify(resultado)
 
 
-# --- FEATURE 3: GUARDAR UBICACIÓN DEL MÉDICO ---
 @bp_mapa.route("/seleccionar/<int:medico_id>")
 @login_required
 def seleccionar_ubicacion(medico_id):
-    medico = Medico.query.get_or_404(medico_id)
+    medico = bd.session.get(Medico, medico_id)
+    if not medico:
+        abort(404)
     return render_template("mapa/seleccionar_ubicacion.html", medico=medico)
 
 
 @bp_mapa.route("/guardar-ubicacion", methods=["POST"])
 @login_required
 def guardar_ubicacion():
-    medico = Medico.query.filter_by(usuario_id=current_user.id).first_or_404()
+    medico = Medico.query.filter_by(usuario_id=current_user.id).first()
+    if not medico:
+        abort(404)
 
     medico.latitud               = request.form.get("latitud", type=float)
     medico.longitud              = request.form.get("longitud", type=float)
@@ -62,4 +58,4 @@ def guardar_ubicacion():
     bd.session.commit()
 
     flash("Ubicación guardada correctamente.", "success")
-    return redirect(url_for("medicos.detalle_medico", medico_id=medico.id))
+    return redirect(url_for("medicos.detalle", medico_id=medico.id))

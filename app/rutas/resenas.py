@@ -6,21 +6,22 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from app import bd
-from app.models import Resena, Medico # Descomentar cuando Hugo termine
-from sqlalchemy import func # se  agrego func para pensar en el promedio
+from app.models import Resena, Medico  # Descomentar cuando Hugo termine
+from sqlalchemy import func  # se  agrego func para pensar en el promedio
 
-bp_resenas = Blueprint("resenas", __name__ , url_prefix='/resenas')
+bp_resenas = Blueprint("resenas", __name__, url_prefix='/resenas')
+
 
 # --- HELPER: recalcular_calificacion (Lógica central) ---
 def recalcular_calificacion(medico_id):
     """Calcula el promedio y total de reseñas y actualiza al médico."""
-    medico = Medico.query.get(medico_id)
+    medico = bd.session.get(Medico, medico_id)
     if not medico:
         return
 
     # Obtenemos todas las reseñas de este médico
     resenas = Resena.query.filter_by(medico_id=medico_id).all()
-    
+
     total = len(resenas)
     if total > 0:
         promedio = sum(r.puntuacion for r in resenas) / total
@@ -39,7 +40,7 @@ def recalcular_calificacion(medico_id):
 def agregar_resena(medico_id):
     # 1. Verificar si el usuario ya reseñó a este médico
     existente = Resena.query.filter_by(usuario_id=current_user.id, medico_id=medico_id).first()
-    
+
     if existente:
         flash("Ya has dejado una reseña para este médico. Puedes editarla si lo deseas.", "warning")
         return redirect(url_for('medicos.detalle', medico_id=medico_id))
@@ -57,13 +58,13 @@ def agregar_resena(medico_id):
         puntuacion=request.form.get('puntuacion', type=int),
         comentario=request.form.get('comentario')
     )
-    
+
     bd.session.add(nueva_resena)
     bd.session.commit()
-    
+
     # 4. Actualizar estadísticas del médico
     recalcular_calificacion(medico_id)
-    
+
     flash("¡Reseña publicada con éxito!", "success")
     return redirect(url_for('medicos.detalle', medico_id=medico_id))
 
@@ -82,14 +83,15 @@ def editar_resena(resena_id):
     if request.method == "POST":
         resena.puntuacion = request.form.get('puntuacion', type=int)
         resena.comentario = request.form.get('comentario')
-        
+
         bd.session.commit()
         recalcular_calificacion(resena.medico_id)
-        
+
         flash("Reseña actualizada.", "success")
         return redirect(url_for('medicos.detalle', medico_id=resena.medico_id))
 
     return render_template("resenas/editar.html", resena=resena)
+
 
 # --- FEATURE 3: ELIMINAR RESEÑA PROPIA ---
 @bp_resenas.route("/eliminar/<int:resena_id>", methods=["POST"])
@@ -102,7 +104,7 @@ def eliminar_resena(resena_id):
     if resena.usuario_id == current_user.id or current_user.rol == 'admin':
         bd.session.delete(resena)
         bd.session.commit()
-        
+
         # Recalcular después de borrar
         recalcular_calificacion(medico_id)
         flash("Reseña eliminada correctamente.", "info")

@@ -1,3 +1,5 @@
+import os
+from dotenv import load_dotenv
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -7,12 +9,13 @@ gestor_login = LoginManager()
 
 
 def crear_app(config=None):
+    load_dotenv()
     app = Flask(__name__)
 
-    # Config por defecto
+    # Config por defecto + .env
     app.config.update({
-        "SECRET_KEY": "dev-secret-key",
-        "SQLALCHEMY_DATABASE_URI": "sqlite:///medicerca.db",
+        "SECRET_KEY": os.getenv("SECRET_KEY", "dev-secret-key"),
+        "SQLALCHEMY_DATABASE_URI": os.getenv("DATABASE_URL", "sqlite:///medicerca.db"),
         "SQLALCHEMY_TRACK_MODIFICATIONS": False,
     })
 
@@ -28,7 +31,7 @@ def crear_app(config=None):
 
     @gestor_login.user_loader
     def cargar_usuario(usuario_id):
-        return Usuario.query.get(int(usuario_id))
+        return bd.session.get(Usuario, int(usuario_id))
 
     with app.app_context():
         from app.models.models import Usuario, Medico, Resena
@@ -45,7 +48,8 @@ def crear_app(config=None):
 
     from app.rutas.mapa import bp_mapa
     app.register_blueprint(bp_mapa, url_prefix="/mapa")
-    # from app.rutas.resenas import bp_resenas
-    # app.register_blueprint(bp_resenas, url_prefix="/resenas")
+
+    from app.rutas.resenas import bp_resenas
+    app.register_blueprint(bp_resenas, url_prefix="/resenas")
 
     return app
