@@ -62,7 +62,7 @@ def detalle(medico_id):
     medico = Medico.query.get_or_404(medico_id)
     return render_template("medicos/detalle.html", medico=medico)
 
-#F3 Formulario de registro medico
+#F3 Formulario de registro medico — FEATURE 4: Guardar perfil médico
 @bp_medicos.route("/registrar", methods=["GET", "POST"])
 @login_required
 def registrar():
@@ -95,12 +95,7 @@ def registrar():
     return render_template("medicos/registrar.html")
 
 
-# TODO (Mathi) — FEATURE 4: Guardar perfil médico
-
-
-
-
-# TODO (Mathi) — FEATURE 5: Formulario de edición
+# TODO (Mathi) — FEATURE 5: Formulario de edición - FEATURE 6: Guardar edición
 @bp_medicos.route("/editar/<int:medico_id>", methods=["GET", "POST"])
 @login_required
 def editar(medico_id):
@@ -128,8 +123,15 @@ def editar(medico_id):
 
     return render_template("medicos/editar.html", medico=medico)
 
-# TODO (Mathi) — FEATURE 6: Guardar edición
-
-
 
 # --- FEATURE 5: MAPA DE MÉDICOS ---
+
+
+@bp_medicos.route("/mapa")
+def mapa_medicos():
+    # Filtramos médicos que tengan coordenadas
+    medicos_geolocalizados = Medico.query.filter(
+        Medico.latitud.isnot(None), 
+        Medico.longitud.isnot(None)
+    ).join(Usuario).all()
+    return render_template("medicos/mapa.html", medicos=medicos_geolocalizados)
