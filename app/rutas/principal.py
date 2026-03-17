@@ -11,7 +11,7 @@ def inicio():
     medicos_recientes = Medico.query.order_by(Medico.creado_en.desc()).limit(6).all()
     return render_template("inicio/inicio.html",total_medicos=total_medicos,medicos_recientes=medicos_recientes)
 
-# TODO (Arturo) — FEATURE 2: Panel del usuario
-# GET /panel
-# - No requiere login (el template usa current_user directamente)
-# - Template: "panel/panel.html"
+# FEATURE 2: Panel del usuario
+@bp_principal.route("/panel")
+def panel():
+    return render_template("panel/panel.html")
