@@ -50,7 +50,7 @@
       id="btn-guardar"
       disabled
       class="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-semibold
-             hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
+            hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
       Guardar ubicación
     </button>
 
@@ -63,8 +63,46 @@
 {% block pie_extra %}
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    // ARTURO: mapa interactivo para seleccionar ubicación
-    // Al click → actualizar inputs hidden latitud/longitud
-    // TODO
+    const mapa = L.map("mapa-selector").setView([-23.4425, -58.4438], 7);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "© OpenStreetMap contributors"
+    }).addTo(mapa);
+
+    let marcador = null;
+
+    // Variables de Jinja2 pasadas a JS de forma segura
+    const latGuardada = {{ medico.latitud | tojson }} ?? null;
+    const lngGuardada = {{ medico.longitud | tojson }} ?? null;
+
+    // Si ya tiene ubicación, mostrarla
+    if (latGuardada && lngGuardada) {
+      marcador = L.marker([latGuardada, lngGuardada]).addTo(mapa);
+      mapa.setView([latGuardada, lngGuardada], 14);
+      document.getElementById("latitud").value  = latGuardada;
+      document.getElementById("longitud").value = lngGuardada;
+      document.getElementById("coords-texto").textContent =
+        `Ubicación actual: ${latGuardada}, ${lngGuardada}`;
+      document.getElementById("btn-guardar").disabled = false;
+    }
+
+    // Click en el mapa → colocar/mover marcador
+    mapa.on("click", function(e) {
+      const lat = e.latlng.lat.toFixed(6);
+      const lng = e.latlng.lng.toFixed(6);
+
+      document.getElementById("latitud").value  = lat;
+      document.getElementById("longitud").value = lng;
+
+      document.getElementById("coords-texto").textContent =
+        `Ubicación seleccionada: ${lat}, ${lng}`;
+      document.getElementById("btn-guardar").disabled = false;
+
+      if (marcador) {
+        marcador.setLatLng(e.latlng);
+      } else {
+        marcador = L.marker(e.latlng).addTo(mapa);
+      }
+    });
   </script>
 {% endblock %}
