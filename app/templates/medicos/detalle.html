@@ -3,290 +3,247 @@
 
 {% block contenido %}
 
-<div class="max-w-6xl mx-auto px-6 py-10">
+<div class="max-w-4xl mx-auto px-4 md:px-8 py-10 space-y-5">
 
-  <!-- CABECERA DEL MÉDICO -->
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
+  <!-- ━━ HERO CARD ━━ -->
+  <div class="bg-white rounded-2xl border border-gray-100/80 shadow-card overflow-hidden">
 
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+    <!-- Top accent bar with gradient -->
+    <div class="h-1 bg-gradient-to-r from-[#3B82F6] via-[#60A5FA] to-[#F0F9FF]"></div>
 
-      <div class="flex items-center gap-5">
+    <div class="p-6 md:p-8">
+      <div class="flex flex-col sm:flex-row sm:items-start gap-6">
 
-        <!-- AVATAR -->
-        <div class="w-20 h-20 rounded-full bg-[#cbe4fe] flex items-center justify-center text-3xl">
+        <!-- Avatar -->
+        <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#F0F9FF] to-[#60A5FA] flex items-center justify-center text-4xl flex-shrink-0 shadow-sm">
           👨‍⚕️
         </div>
 
-        <!-- INFO PRINCIPAL -->
-        <div>
-
-          <div class="flex items-center gap-3">
-            <h1 class="text-2xl font-bold text-[#252529]">
+        <!-- Info -->
+        <div class="flex-1 min-w-0">
+          <div class="flex flex-wrap items-center gap-2.5 mb-1">
+            <h1 class="text-2xl font-bold tracking-tight text-[#1F2937]">
               {{ medico.usuario.nombre }}
             </h1>
-
             {% if medico.verificado %}
-            <span class="text-xs bg-[#97D663] text-white px-2 py-1 rounded">
-              ✓ Verificado
+            <span class="inline-flex items-center gap-1 bg-[#3B82F6]/15 text-[#3B82F6] text-xs font-bold px-2.5 py-1 rounded-full border border-[#3B82F6]/25">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+              </svg>
+              Verificado
             </span>
             {% endif %}
           </div>
 
-          <p class="text-[#205ea6] font-medium">
-            {{ medico.especialidad }}
-          </p>
+          <p class="text-[#3B82F6] font-semibold text-base mb-1">{{ medico.especialidad }}</p>
 
-          {% if medico.hospital %}
-          <p class="text-gray-600 text-sm">
-            {{ medico.hospital }}
-          </p>
+          <div class="flex flex-wrap gap-3 text-sm text-gray-500">
+            {% if medico.hospital %}
+            <span class="flex items-center gap-1.5">🏥 {{ medico.hospital }}</span>
+            {% endif %}
+            {% if medico.ciudad %}
+            <span class="flex items-center gap-1.5 text-gray-400">·</span>
+            <span class="flex items-center gap-1.5">📍 {{ medico.ciudad }}</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex flex-wrap gap-2.5 flex-shrink-0">
+          {% if current_user.is_authenticated and current_user.id == medico.usuario_id %}
+          <a href="{{ url_for('medicos.editar_medico', medico_id=medico.id) }}"
+             class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#3B82F6] text-white font-semibold text-sm
+                    hover:bg-[#60A5FA] hover:scale-[1.02] hover:shadow-[0_4px_12px_rgba(59,130,246,0.24)]
+                    active:scale-[0.98] transition-all duration-200">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+            </svg>
+            Editar perfil
+          </a>
           {% endif %}
-
+          {% if medico.latitud %}
+          <a href="{{ url_for('mapa.mapa_medicos') }}#medico-{{ medico.id }}"
+             class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-medium text-sm
+                    hover:border-gray-300 hover:bg-gray-50 hover:scale-[1.02]
+                    active:scale-[0.98] transition-all duration-200">
+            🗺️ Ver en mapa
+          </a>
+          {% endif %}
         </div>
 
       </div>
+    </div>
+  </div>
 
 
-      <!-- BOTONES -->
-      <div class="flex gap-3">
+  <!-- ━━ CONTENT GRID ━━ -->
+  <div class="grid md:grid-cols-2 gap-5">
 
-        {% if current_user.is_authenticated and current_user.id == medico.usuario_id %}
-        <a
-          href="{{ url_for('medicos.editar_medico', medico_id=medico.id) }}"
-          class="px-4 py-2 rounded-xl bg-[#8BF57A] text-[#252529] font-medium hover:opacity-90 transition">
-          Editar
-        </a>
+    <!-- Información profesional -->
+    <div class="bg-white rounded-2xl border border-gray-100/80 shadow-card p-6">
+      <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-5">
+        Información profesional
+      </h2>
+      <div class="space-y-4">
+
+        <div class="flex items-start justify-between py-2.5 border-b border-gray-100 last:border-0">
+          <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Matrícula</span>
+          <span class="font-mono text-sm font-medium text-[#1F2937]">{{ medico.numero_matricula }}</span>
+        </div>
+
+        {% if medico.ciudad %}
+        <div class="flex items-start justify-between py-2.5 border-b border-gray-100 last:border-0">
+          <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Ciudad</span>
+          <span class="text-sm font-medium text-[#1F2937]">{{ medico.ciudad }}</span>
+        </div>
         {% endif %}
 
-        {% if medico.latitud %}
-        <a
-          href="{{ url_for('mapa.mapa_medicos') }}#medico-{{ medico.id }}"
-          class="px-4 py-2 rounded-xl border border-gray-300 hover:bg-gray-100 transition">
-          Ver en mapa
-        </a>
+        {% if medico.anios_experiencia %}
+        <div class="flex items-start justify-between py-2.5 border-b border-gray-100 last:border-0">
+          <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Experiencia</span>
+          <span class="text-sm font-medium text-[#1F2937]">{{ medico.anios_experiencia }} años</span>
+        </div>
+        {% endif %}
+
+        {% if medico.telefono %}
+        <div class="flex items-start justify-between py-2.5 border-b border-gray-100 last:border-0">
+          <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Teléfono</span>
+          <span class="text-sm font-medium text-[#1F2937]">{{ medico.telefono }}</span>
+        </div>
         {% endif %}
 
       </div>
+    </div>
 
+    <!-- Calificación -->
+    <div class="bg-white rounded-2xl border border-gray-100/80 shadow-card p-6 flex flex-col justify-between">
+      <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-5">Calificación</h2>
+      <div class="flex items-end gap-4 mb-4">
+        <div class="text-5xl font-bold text-[#1F2937] tracking-tight leading-none">
+          {{ medico.calificacion_promedio or "—" }}
+        </div>
+        <div class="pb-1">
+          <div class="text-yellow-400 text-lg leading-none mb-1">
+            {% if medico.calificacion_promedio %}
+              {% set llenas = medico.calificacion_promedio | round | int %}
+              {{ "★" * llenas }}{{ "☆" * (5 - llenas) }}
+            {% else %}
+              ☆☆☆☆☆
+            {% endif %}
+          </div>
+          <p class="text-xs text-gray-400 font-medium">
+            {{ medico.total_resenas or 0 }} reseña{{ 's' if (medico.total_resenas or 0) != 1 else '' }}
+          </p>
+        </div>
+      </div>
+      {% if not medico.calificacion_promedio %}
+      <p class="text-xs text-gray-400 italic">Sin calificaciones aún</p>
+      {% endif %}
     </div>
 
   </div>
 
 
-
-  <!-- DATOS DEL MÉDICO -->
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
-
-    <h2 class="text-xl font-semibold mb-4">
-      Información profesional
-    </h2>
-
-    <div class="grid md:grid-cols-2 gap-4 text-sm">
-
-      <div>
-        <span class="text-gray-500">Matrícula</span>
-        <p class="font-medium">{{ medico.numero_matricula }}</p>
-      </div>
-
-      {% if medico.ciudad %}
-      <div>
-        <span class="text-gray-500">Ciudad</span>
-        <p class="font-medium">{{ medico.ciudad }}</p>
-      </div>
-      {% endif %}
-
-      {% if medico.anios_experiencia %}
-      <div>
-        <span class="text-gray-500">Experiencia</span>
-        <p class="font-medium">{{ medico.anios_experiencia }} años</p>
-      </div>
-      {% endif %}
-
-      {% if medico.telefono %}
-      <div>
-        <span class="text-gray-500">Teléfono</span>
-        <p class="font-medium">{{ medico.telefono }}</p>
-      </div>
-      {% endif %}
-
+  <!-- ━━ UNIVERSIDAD + CONSULTORIO ━━ -->
+  {% if medico.universidad_graduacion or medico.direccion_consultorio %}
+  <div class="bg-white rounded-2xl border border-gray-100/80 shadow-card p-6">
+    <div class="grid sm:grid-cols-2 gap-5">
       {% if medico.universidad_graduacion %}
-      <div class="md:col-span-2">
-        <span class="text-gray-500">Universidad</span>
-        <p class="font-medium">
-          🎓 {{ medico.universidad_graduacion }}
-        </p>
+      <div>
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">Universidad</p>
+        <p class="text-sm font-medium text-[#1F2937]">🎓 {{ medico.universidad_graduacion }}</p>
       </div>
       {% endif %}
-
       {% if medico.direccion_consultorio %}
-      <div class="md:col-span-2">
-        <span class="text-gray-500">Consultorio</span>
-        <p class="font-medium">
-          {{ medico.direccion_consultorio }}
-        </p>
+      <div>
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">Consultorio</p>
+        <p class="text-sm font-medium text-[#1F2937]">📍 {{ medico.direccion_consultorio }}</p>
       </div>
       {% endif %}
-
     </div>
-
-  </div>
-
-
-
-  <!-- BIOGRAFÍA -->
-  {% if medico.biografia %}
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
-
-    <h2 class="text-xl font-semibold mb-4">
-      Sobre el médico
-    </h2>
-
-    <p class="text-gray-700 leading-relaxed">
-      {{ medico.biografia }}
-    </p>
-
   </div>
   {% endif %}
 
 
-
-  <!-- RATING -->
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-8">
-
-    <h2 class="text-xl font-semibold mb-4">
-      Calificación
-    </h2>
-
-    <div class="flex items-center gap-4">
-
-      <div class="text-yellow-500 text-xl">
-        {{ medico.calificacion_promedio or "☆☆☆☆☆" }}
-      </div>
-
-      <div class="text-gray-600 text-sm">
-        {{ medico.total_resenas or 0 }} reseña(s)
-      </div>
-
-    </div>
-
+  <!-- ━━ BIOGRAFÍA ━━ -->
+  {% if medico.biografia %}
+  <div class="bg-[#F0F9FF]/40 border border-[#F0F9FF] rounded-2xl p-6">
+    <h2 class="text-sm font-bold text-[#3B82F6] uppercase tracking-widest mb-3">Sobre el médico</h2>
+    <p class="text-sm text-gray-700 leading-relaxed">{{ medico.biografia }}</p>
   </div>
+  {% endif %}
 
 
+  <!-- ━━ RESEÑAS ━━ -->
+  <div class="bg-white rounded-2xl border border-gray-100/80 shadow-card p-6 md:p-8">
 
-  <!-- RESEÑAS -->
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+    <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6">Reseñas de pacientes</h2>
 
-    <h2 class="text-xl font-semibold mb-6">
-      Reseñas
-    </h2>
-
-
-    <!-- FORM NUEVA RESEÑA -->
+    <!-- Form -->
     {% if current_user.is_authenticated and current_user.id != medico.usuario_id %}
-
-    <form
-      method="POST"
-      action="{{ url_for('resenas.agregar_resena', medico_id=medico.id) }}"
-      class="mb-8 space-y-4">
-
-      <div>
-        <label class="block text-sm text-gray-600 mb-1">
-          Puntuación
-        </label>
-
-        <select
-          name="puntuacion"
-          class="border border-gray-300 rounded-lg px-3 py-2">
-
-          <option value="5">★★★★★</option>
-          <option value="4">★★★★</option>
-          <option value="3">★★★</option>
-          <option value="2">★★</option>
-          <option value="1">★</option>
-
-        </select>
-      </div>
-
-      <div>
-        <label class="block text-sm text-gray-600 mb-1">
-          Comentario
-        </label>
-
-        <textarea
-          name="comentario"
-          rows="3"
-          class="w-full border border-gray-300 rounded-lg px-3 py-2"></textarea>
-      </div>
-
-      <button
-        type="submit"
-        class="bg-[#8BF57A] text-[#252529] px-5 py-2 rounded-xl font-medium hover:opacity-90 transition">
-        Publicar reseña
-      </button>
-
-    </form>
-
+    <div class="bg-gray-50/70 rounded-xl border border-gray-100 p-5 mb-8">
+      <p class="text-sm font-semibold text-[#1F2937] mb-4">Dejá tu reseña</p>
+      <form method="POST" action="{{ url_for('resenas.agregar_resena', medico_id=medico.id) }}" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Puntuación</label>
+          <select name="puntuacion"
+                  class="border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm bg-white outline-none
+                         focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent
+                         hover:border-gray-300 transition-all duration-200 cursor-pointer">
+            <option value="5">⭐⭐⭐⭐⭐ Excelente</option>
+            <option value="4">⭐⭐⭐⭐ Muy bueno</option>
+            <option value="3">⭐⭐⭐ Bueno</option>
+            <option value="2">⭐⭐ Regular</option>
+            <option value="1">⭐ Malo</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Comentario <span class="text-gray-300 normal-case font-normal">(opcional)</span></label>
+          <textarea name="comentario" rows="3"
+                    placeholder="Contá tu experiencia..."
+                    class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm bg-white outline-none
+                           focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent
+                           hover:border-gray-300 transition-all duration-200 resize-none"></textarea>
+        </div>
+        <button type="submit"
+                class="inline-flex items-center gap-2 bg-[#3B82F6] text-white font-semibold text-sm px-5 py-2.5 rounded-xl
+                       hover:bg-[#60A5FA] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200">
+          Publicar reseña
+        </button>
+      </form>
+    </div>
     {% endif %}
 
-
-
-    <!-- LISTA DE RESEÑAS -->
-    <div class="space-y-6">
-
+    <!-- List -->
+    <div class="space-y-4">
       {% for resena in medico.resenas %}
-
-      <div class="border-t pt-4">
-
-        <div class="flex items-center justify-between">
-
-          <div class="font-medium">
-            {{ resena.autor.nombre }}
+      <div class="bg-white border border-gray-100 rounded-xl p-4 hover:border-gray-200 transition-colors duration-150">
+        <div class="flex items-start justify-between mb-2">
+          <div>
+            <p class="text-sm font-semibold text-[#1F2937]">{{ resena.autor.nombre }}</p>
+            <p class="text-xs text-gray-400 mt-0.5">{{ resena.creado_en }}</p>
           </div>
-
-          <div class="text-yellow-500 text-sm">
-            {{ "★" * resena.puntuacion }}
+          <div class="text-yellow-400 text-sm">
+            {{ "★" * resena.puntuacion }}{{ "☆" * (5 - resena.puntuacion) }}
           </div>
-
         </div>
-
-        <p class="text-gray-700 mt-2">
-          {{ resena.comentario }}
-        </p>
-
-        <p class="text-xs text-gray-400 mt-1">
-          {{ resena.creado_en }}
-        </p>
-
-        {% if current_user.is_authenticated and resena.usuario_id == current_user.id %}
-
-        <div class="mt-2 flex gap-3 text-sm">
-
-          <a
-            href="#"
-            class="text-[#205ea6] hover:underline">
-            Editar
-          </a>
-
-          <a
-            href="#"
-            class="text-[#ee6e6e] hover:underline">
-            Eliminar
-          </a>
-
-        </div>
-
+        {% if resena.comentario %}
+        <p class="text-sm text-gray-600 leading-relaxed">{{ resena.comentario }}</p>
         {% endif %}
-
+        {% if current_user.is_authenticated and resena.usuario_id == current_user.id %}
+        <div class="mt-3 flex gap-4 text-xs">
+          <a href="#" class="text-[#3B82F6] hover:underline font-medium">Editar</a>
+          <a href="#" class="text-red-400 hover:underline font-medium">Eliminar</a>
+        </div>
+        {% endif %}
       </div>
-
       {% else %}
-
-      <p class="text-gray-500">
-        Aún no hay reseñas para este médico.
-      </p>
-
+      <div class="text-center py-12">
+        <div class="text-4xl mb-3 opacity-25">💬</div>
+        <p class="text-sm text-gray-400">Aún no hay reseñas para este médico.</p>
+      </div>
       {% endfor %}
-
     </div>
 
   </div>

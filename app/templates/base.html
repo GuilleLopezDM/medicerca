@@ -1,41 +1,358 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>{% block titulo %}MediCerca{% endblock %}</title>
+  <script>
+    (function () {
+      const saved = localStorage.getItem('medicerca-theme');
+      if (saved === 'dark') document.documentElement.classList.add('dark');
+    })();
+  </script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'system-ui', 'sans-serif'],
+            mono: ['"Geist Mono"', 'monospace'],
+          },
+          colors: {
+            brand:  { DEFAULT: '#3B82F6', soft: '#60A5FA', ink: '#1F2937', surface: '#F0F9FF' },
+          },
+          boxShadow: {
+            card: '0 10px 30px rgba(15, 23, 42, 0.06)',
+            lift: '0 20px 50px rgba(15, 23, 42, 0.10)',
+            glow: '0 12px 30px rgba(59, 130, 246, 0.18)',
+          },
+          animation: {
+            'fade-in': 'fadeIn .45s ease-out both',
+            'slide-up': 'slideUp .5s ease-out both',
+          },
+          keyframes: {
+            fadeIn: { from: { opacity: '0' }, to: { opacity: '1' } },
+            slideUp: { from: { opacity: '0', transform: 'translateY(14px)' }, to: { opacity: '1', transform: 'translateY(0)' } },
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      --mc-primary: #3B82F6;
+      --mc-secondary: #60A5FA;
+      --mc-ink: #1F2937;
+      --mc-surface: #F0F9FF;
+      --mc-card: rgba(255,255,255,.88);
+      --mc-card-border: rgba(148,163,184,.16);
+      --mc-muted: #64748B;
+      --mc-nav: rgba(255,255,255,.82);
+      --mc-footer: rgba(255,255,255,.9);
+    }
+    html.dark {
+      color-scheme: dark;
+      --mc-card: rgba(15,23,42,.82);
+      --mc-card-border: rgba(148,163,184,.20);
+      --mc-muted: #94A3B8;
+      --mc-nav: rgba(15,23,42,.84);
+      --mc-footer: rgba(15,23,42,.92);
+    }
+    body {
+      background:
+        radial-gradient(circle at top left, rgba(96,165,250,.18), transparent 26%),
+        linear-gradient(180deg, var(--mc-surface) 0%, #ffffff 52%, var(--mc-surface) 100%);
+      color: var(--mc-ink);
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    html.dark body {
+      background:
+        radial-gradient(circle at top left, rgba(59,130,246,.16), transparent 28%),
+        linear-gradient(180deg, #020617 0%, #0f172a 60%, #111827 100%);
+      color: #E5EEF9;
+    }
+    .glass-card {
+      background: var(--mc-card);
+      border: 1px solid var(--mc-card-border);
+      backdrop-filter: blur(18px);
+    }
+    .auth-shell {
+      background:
+        radial-gradient(circle at top center, rgba(59,130,246,.10), transparent 42%),
+        linear-gradient(180deg, #F0F9FF 0%, #FFFFFF 58%, #F8FBFF 100%);
+    }
+    .auth-card {
+      background: rgba(255,255,255,.96);
+      border: 1px solid rgba(148,163,184,.22);
+      box-shadow: 0 24px 60px rgba(15,23,42,.10), 0 8px 24px rgba(59,130,246,.06);
+    }
+    html.dark .auth-shell {
+      background:
+        radial-gradient(circle at top center, rgba(59,130,246,.14), transparent 38%),
+        linear-gradient(180deg, #020617 0%, #0F172A 55%, #111827 100%);
+    }
+    html.dark .auth-card {
+      background: rgba(15,23,42,.94) !important;
+      border-color: rgba(96,165,250,.18) !important;
+      box-shadow: 0 28px 80px rgba(2,6,23,.55), inset 0 1px 0 rgba(255,255,255,.03);
+    }
+    .text-gray-400, .text-slate-400 { color: #64748B !important; }
+    .text-gray-500, .text-slate-500 { color: #475569 !important; }
+    .text-gray-600, .text-slate-600 { color: #334155 !important; }
+    .text-gray-700, .text-slate-700 { color: #1F2937 !important; }
+    .placeholder-gray-400::placeholder,
+    input::placeholder,
+    textarea::placeholder { color: #64748B !important; opacity: 1; }
+    .bg-white\/70 .text-slate-500,
+    .bg-white\/80 .text-slate-500,
+    .bg-gray-50 .text-gray-500,
+    .bg-gray-50\/60 .text-gray-500,
+    .bg-gray-50\/70 .text-gray-500,
+    .bg-\[\#F0F9FF\]\/40 .text-gray-700 { color: #334155 !important; }
+    .bg-\[\#3B82F6\]\/10.text-\[\#3B82F6\],
+    .bg-white .text-\[\#3B82F6\],
+    .bg-white\/80 .text-\[\#3B82F6\] { color: #1D4ED8 !important; }
+    .hero-readable {
+      text-shadow: 0 1px 0 rgba(255,255,255,.35);
+    }
+    html.dark .bg-white,
+    html.dark [class*="bg-white/"] {
+      background-color: rgba(15,23,42,.82) !important;
+      color: #E5EEF9;
+      border-color: rgba(148,163,184,.18) !important;
+    }
+    html.dark .bg-gray-50,
+    html.dark .bg-gray-50\/60,
+    html.dark .bg-gray-50\/70,
+    html.dark .bg-slate-50,
+    html.dark .bg-red-50,
+    html.dark .bg-green-50,
+    html.dark .bg-amber-50 {
+      background-color: rgba(30,41,59,.78) !important;
+      border-color: rgba(148,163,184,.16) !important;
+    }
+    html.dark .text-gray-400,
+    html.dark .text-gray-500,
+    html.dark .text-gray-600,
+    html.dark .text-gray-700 { color: #94A3B8 !important; }
+    html.dark .text-\[\#1F2937\],
+    html.dark .text-\[\#205ea6\],
+    html.dark .hero-readable,
+    html.dark h1,
+    html.dark h2,
+    html.dark h3 { color: #E5EEF9 !important; text-shadow: none; }
+    html.dark .text-\[\#3B82F6\] { color: #93C5FD !important; }
+    html.dark .bg-\[\#3B82F6\]\/8,
+    html.dark .bg-\[\#3B82F6\]\/10,
+    html.dark .bg-\[\#F0F9FF\],
+    html.dark .bg-\[\#F0F9FF\]\/40 { background-color: rgba(30,41,59,.92) !important; }
+    html.dark .from-\[\#3B82F6\]\/8,
+    html.dark .to-transparent { opacity: .9; }
+    html.dark .text-red-700 { color: #FCA5A5 !important; }
+    html.dark .text-green-800 { color: #86EFAC !important; }
+    html.dark .text-amber-800 { color: #FCD34D !important; }
+    html.dark .border-gray-100,
+    html.dark .border-gray-100\/80,
+    html.dark .border-gray-200,
+    html.dark .border-blue-100,
+    html.dark .border-blue-200,
+    html.dark .border-green-200,
+    html.dark .border-red-200,
+    html.dark .border-amber-200 { border-color: rgba(148,163,184,.16) !important; }
+    html.dark input,
+    html.dark select,
+    html.dark textarea {
+      background-color: rgba(15,23,42,.7) !important;
+      color: #E5EEF9 !important;
+      border-color: rgba(148,163,184,.18) !important;
+    }
+    html.dark input::placeholder,
+    html.dark textarea::placeholder { color: #94A3B8 !important; }
+    html.dark .leaflet-popup-content-wrapper,
+    html.dark .leaflet-popup-tip { background: #0f172a; color: #E5EEF9; }
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      z-index: 70;
+      background: transparent;
+    }
+    .scroll-progress__bar {
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--mc-primary), var(--mc-secondary));
+      box-shadow: 0 0 18px rgba(59,130,246,.45);
+      transition: width .08s linear;
+    }
+    .theme-toggle-dot { transition: transform .25s ease; }
+    html.dark .theme-toggle-dot { transform: translateX(1.1rem); }
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .45s ease, transform .45s ease; }
+    .reveal.is-visible { opacity: 1; transform: translateY(0); }
+  </style>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
   {% block cabecera_extra %}{% endblock %}
 </head>
-<body>
 
-  <!-- DIEGO: NAVBAR aquí -->
-  <!-- Links del navbar:
-       - 🩺 MediCerca (logo, link a principal.inicio)
-       - Médicos → url_for('medicos.lista_medicos')
-       - Mapa    → url_for('mapa.mapa_medicos')       ← NUEVO
-       Si logueado:
-       - Mi Panel → url_for('principal.panel')
-       - Salir    → url_for('autenticacion.cerrar_sesion')
-       Si no logueado:
-       - Iniciar Sesión → url_for('autenticacion.iniciar_sesion')
-       - Registrarse    → url_for('autenticacion.registro')
-  -->
+<body class="text-[#1F2937] dark:text-slate-100 font-sans antialiased min-h-screen flex flex-col">
+<div class="scroll-progress" aria-hidden="true"><div id="scroll-progress-bar" class="scroll-progress__bar"></div></div>
 
+<header class="sticky top-0 z-50 border-b border-white/50 bg-[var(--mc-nav)] backdrop-blur-xl supports-[backdrop-filter]:bg-[var(--mc-nav)]">
+  <nav class="max-w-7xl mx-auto px-4 md:px-8 h-16 flex items-center justify-between gap-4">
+    <a href="{{ url_for('principal.inicio') }}" class="flex items-center gap-2 text-[#1F2937] dark:text-slate-100 hover:opacity-80 transition-opacity duration-200 flex-shrink-0">
+      <span class="grid place-items-center w-10 h-10 rounded-2xl bg-white/90 dark:bg-slate-900 shadow-card">🩺</span>
+      <div class="leading-tight">
+        <span class="block text-base font-semibold tracking-tight">MediCerca</span>
+        <span class="hidden sm:block text-[11px] text-#E9F2FC dark:text-slate-400">Médicos verificados en Paraguay</span>
+      </div>
+    </a>
 
-  <!-- DIEGO: FLASH MESSAGES aquí -->
-  {# Tip: usar get_flashed_messages(with_categories=true) #}
+    <div class="hidden md:flex items-center gap-1 glass-card rounded-2xl px-2 py-1 shadow-card">
+      <a href="{{ url_for('medicos.lista_medicos') }}" class="px-3.5 py-2 rounded-xl text-sm font-medium text-#E9F2FC dark:text-slate-300 hover:text-[#3B82F6] hover:bg-white/80 dark:hover:bg-slate-800 transition-all duration-200">Médicos</a>
+      <a href="{{ url_for('mapa.mapa_medicos') }}" class="px-3.5 py-2 rounded-xl text-sm font-medium text-#E9F2FC dark:text-slate-300 hover:text-[#3B82F6] hover:bg-white/80 dark:hover:bg-slate-800 transition-all duration-200">Mapa</a>
+    </div>
 
+    <div class="flex items-center gap-2">
+      <button id="theme-toggle" type="button" class="hidden sm:inline-flex items-center w-[3.2rem] h-9 rounded-full border border-slate-200/70 dark:border-slate-700 bg-white/90 dark:bg-slate-900 px-1 shadow-card transition" aria-label="Cambiar tema" title="Cambiar tema">
+        <span class="theme-toggle-dot grid place-items-center w-7 h-7 rounded-full bg-[#3B82F6] text-white text-xs shadow-sm">☼</span>
+      </button>
 
-  <main>
-    {% block contenido %}{% endblock %}
-  </main>
+      {% if current_user.is_authenticated %}
+        <a href="{{ url_for('principal.panel') }}" class="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-200 hover:text-[#3B82F6] hover:bg-white/70 dark:hover:bg-slate-800 transition-all duration-200">
+          <span class="w-7 h-7 rounded-full bg-[#F0F9FF] dark:bg-slate-800 inline-flex items-center justify-center text-xs font-semibold border border-slate-200/70 dark:border-slate-700">{{ current_user.nombre[0] | upper }}</span>
+          Mi Panel
+        </a>
+        <a href="{{ url_for('autenticacion.cerrar_sesion') }}" class="px-3.5 py-2 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-slate-800 transition-all duration-200">Salir</a>
+      {% else %}
+        <a href="{{ url_for('autenticacion.iniciar_sesion') }}" class="hidden sm:inline-flex px-3.5 py-2 rounded-xl text-sm font-medium text-#E9F2FC dark:text-slate-300 hover:text-[#3B82F6] transition-all duration-200">Iniciar sesión</a>
+        <a href="{{ url_for('autenticacion.registro') }}" class="inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold bg-[#3B82F6] text-white hover:bg-[#60A5FA] hover:-translate-y-0.5 hover:shadow-glow active:translate-y-0 transition-all duration-200">Registrarse</a>
+      {% endif %}
 
+      <button id="nav-toggle" class="md:hidden p-2 rounded-xl text-slate-500 dark:text-slate-300 hover:bg-white/70 dark:hover:bg-slate-800 transition-all duration-200" aria-label="Menú">
+        <svg id="icon-open" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        <svg id="icon-close" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+  </nav>
 
-  <!-- DIEGO: FOOTER aquí -->
+  <div id="nav-mobile" class="hidden md:hidden border-t border-white/50 bg-[var(--mc-nav)] backdrop-blur-xl">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col gap-1">
+      <button id="theme-toggle-mobile" type="button" class="sm:hidden flex items-center justify-between px-4 py-3 rounded-2xl glass-card text-sm font-medium text-slate-600 dark:text-slate-200">
+        <span>Modo oscuro</span>
+        <span class="text-xs text-slate-400">Alternar</span>
+      </button>
+      <a href="{{ url_for('medicos.lista_medicos') }}" class="px-4 py-3 rounded-2xl text-sm font-medium text-slate-600 dark:text-slate-200 hover:text-[#3B82F6] hover:bg-white/70 dark:hover:bg-slate-800 transition-all duration-200">Médicos</a>
+      <a href="{{ url_for('mapa.mapa_medicos') }}" class="px-4 py-3 rounded-2xl text-sm font-medium text-slate-600 dark:text-slate-200 hover:text-[#3B82F6] hover:bg-white/70 dark:hover:bg-slate-800 transition-all duration-200">Mapa</a>
+      {% if current_user.is_authenticated %}
+        <a href="{{ url_for('principal.panel') }}" class="px-4 py-3 rounded-2xl text-sm font-medium text-slate-600 dark:text-slate-200 hover:text-[#3B82F6] hover:bg-white/70 dark:hover:bg-slate-800 transition-all duration-200">Mi Panel</a>
+        <a href="{{ url_for('autenticacion.cerrar_sesion') }}" class="px-4 py-3 rounded-2xl text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-slate-800 transition-all duration-200">Salir</a>
+      {% else %}
+        <a href="{{ url_for('autenticacion.iniciar_sesion') }}" class="px-4 py-3 rounded-2xl text-sm font-medium text-slate-600 dark:text-slate-200 hover:bg-white/70 dark:hover:bg-slate-800 transition-all duration-200">Iniciar sesión</a>
+        <a href="{{ url_for('autenticacion.registro') }}" class="px-4 py-3 rounded-2xl text-sm font-semibold bg-[#3B82F6] text-white text-center hover:bg-[#60A5FA] transition-all duration-200">Registrarse</a>
+      {% endif %}
+    </div>
+  </div>
+</header>
 
-  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-  {% block pie_extra %}{% endblock %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="max-w-7xl mx-auto w-full px-4 md:px-8 pt-4 flex flex-col gap-2">
+      {% for category, message in messages %}
+        {% if category in ['success', 'message'] %}
+          <div class="glass-card flex items-start gap-3 px-4 py-3 text-[#3B82F6] dark:text-green-300 rounded-2xl text-sm font-medium shadow-card animate-slide-up"><span class="flex-shrink-0 mt-0.5">✓</span><span>{{ message }}</span></div>
+        {% elif category in ['error', 'danger'] %}
+          <div class="glass-card flex items-start gap-3 px-4 py-3 text-red-700 dark:text-red-300 rounded-2xl text-sm font-medium shadow-card animate-slide-up"><span class="flex-shrink-0 mt-0.5">✕</span><span>{{ message }}</span></div>
+        {% elif category == 'warning' %}
+          <div class="glass-card flex items-start gap-3 px-4 py-3 text-amber-700 dark:text-amber-300 rounded-2xl text-sm font-medium shadow-card animate-slide-up"><span class="flex-shrink-0 mt-0.5">⚠</span><span>{{ message }}</span></div>
+        {% else %}
+          <div class="glass-card flex items-start gap-3 px-4 py-3 text-[#3B82F6] rounded-2xl text-sm font-medium shadow-card animate-slide-up"><span class="flex-shrink-0 mt-0.5">ℹ</span><span>{{ message }}</span></div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<main class="flex-1">
+  {% block contenido %}{% endblock %}
+</main>
+
+<footer class="mt-auto border-t border-white/50 bg-[var(--mc-footer)] backdrop-blur-xl">
+  <div class="max-w-7xl mx-auto px-4 md:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+    <div class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+      <span>🩺</span>
+      <span class="font-medium text-[#1F2937] dark:text-slate-100">MediCerca</span>
+      <span class="text-slate-300 dark:text-slate-600">·</span>
+      <span>Médicos verificados en Paraguay</span>
+    </div>
+    <div class="flex items-center gap-5 text-sm text-slate-400 dark:text-slate-500">
+      <a href="{{ url_for('medicos.lista_medicos') }}" class="hover:text-[#3B82F6] transition-colors duration-150">Directorio</a>
+      <a href="{{ url_for('mapa.mapa_medicos') }}" class="hover:text-[#3B82F6] transition-colors duration-150">Mapa</a>
+      <span>© 2026</span>
+    </div>
+  </div>
+</footer>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script>
+  (function () {
+    const toggle = document.getElementById('nav-toggle');
+    const mobile = document.getElementById('nav-mobile');
+    const iconOpen = document.getElementById('icon-open');
+    const iconClose = document.getElementById('icon-close');
+    if (toggle && mobile) {
+      toggle.addEventListener('click', () => {
+        const isHidden = mobile.classList.toggle('hidden');
+        iconOpen.classList.toggle('hidden', !isHidden);
+        iconClose.classList.toggle('hidden', isHidden);
+      });
+    }
+
+    const syncThemeButtons = () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      document.querySelectorAll('#theme-toggle, #theme-toggle-mobile').forEach((btn) => {
+        if (btn) btn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+      });
+    };
+    const toggleTheme = () => {
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem('medicerca-theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+      syncThemeButtons();
+    };
+    document.getElementById('theme-toggle')?.addEventListener('click', toggleTheme);
+    document.getElementById('theme-toggle-mobile')?.addEventListener('click', toggleTheme);
+    syncThemeButtons();
+
+    const progressBar = document.getElementById('scroll-progress-bar');
+    const updateProgress = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      if (progressBar) progressBar.style.width = progress + '%';
+    };
+    updateProgress();
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    window.addEventListener('resize', updateProgress);
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('is-visible');
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('section, .shadow-card, .shadow-lift').forEach((el) => {
+      el.classList.add('reveal');
+      observer.observe(el);
+    });
+  })();
+</script>
+{% block pie_extra %}{% endblock %}
 </body>
 </html>
