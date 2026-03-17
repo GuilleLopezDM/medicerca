@@ -2,32 +2,74 @@
 {% block titulo %}Mapa de Médicos — MediCerca{% endblock %}
 
 {% block cabecera_extra %}
-  <!-- DIEGO: Leaflet.js CSS — NO borrar -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 {% endblock %}
 
 {% block contenido %}
-<!-- DIEGO + ARTURO: contenido del mapa aquí -->
+<div class="max-w-6xl mx-auto px-4 py-8">
 
-<!-- Estructura sugerida:
-  1. Título + descripción
-  2. Div del mapa con id="mapa" (altura fija, ej: h-[600px])
-  3. Script de Leaflet que consume /mapa/medicos.json
-     y coloca un marcador por cada médico con coordenadas
-  4. Popup del marcador (preview del médico):
-     - Nombre, especialidad, hospital
-     - Estrellas de calificacion_promedio
-     - Botón "Ver perfil" → url_for('medicos.detalle_medico', medico_id=id)
--->
+  <!-- Título -->
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold text-gray-800">Mapa de Médicos</h1>
+    <p class="text-gray-500 mt-1">Encontrá médicos cerca tuyo en Paraguay</p>
+  </div>
 
+  <!-- Mapa -->
+  <div id="mapa" class="w-full h-[600px] rounded-xl shadow-md z-0"></div>
+
+</div>
 {% endblock %}
 
 {% block pie_extra %}
-  <!-- DIEGO: Leaflet.js JS — NO borrar -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
-    // ARTURO: inicializar el mapa y cargar los médicos
-    // TODO: fetch('/mapa/medicos.json') → colocar marcadores
+    // Inicializar mapa centrado en Paraguay
+    const mapa = L.map("mapa").setView([-23.4425, -58.4438], 7);
+
+    // Capa base de OpenStreetMap
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "© OpenStreetMap contributors"
+    }).addTo(mapa);
+
+    // Cargar médicos desde la API
+    fetch("/mapa/medicos.json")
+      .then(res => res.json())
+      .then(medicos => {
+        medicos.forEach(medico => {
+
+          // Estrellas según calificacion_promedio
+          const totalEstrellas = 5;
+          const llenas = Math.round(medico.calificacion_promedio);
+          const estrellas = "★".repeat(llenas) + "☆".repeat(totalEstrellas - llenas);
+
+          // Verificado
+          const badgeVerificado = medico.verificado
+            ? `<span class="text-green-600 text-xs font-semibold">✔ Verificado</span>`
+            : "";
+
+          // Popup
+          const popup = `
+            <div style="min-width:200px">
+              <p class="font-bold text-gray-800 text-base">${medico.nombre}</p>
+              <p class="text-sm text-gray-600">${medico.especialidad}</p>
+              <p class="text-sm text-gray-500">${medico.hospital}</p>
+              <p class="text-yellow-500 text-sm my-1">${estrellas}
+                <span class="text-gray-400 text-xs">(${medico.total_resenas} reseñas)</span>
+              </p>
+              ${badgeVerificado}
+              <a href="${medico.url_perfil}"
+                 class="block mt-2 text-center bg-blue-600 text-white text-sm rounded px-3 py-1 hover:bg-blue-700">
+                Ver perfil
+              </a>
+            </div>
+          `;
+
+          L.marker([medico.latitud, medico.longitud])
+            .addTo(mapa)
+            .bindPopup(popup);
+        });
+      })
+      .catch(err => console.error("Error cargando médicos:", err));
   </script>
 {% endblock %}
