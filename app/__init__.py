@@ -1,20 +1,24 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-from dotenv import load_dotenv
-import os
-load_dotenv()
 
 bd = SQLAlchemy()
 gestor_login = LoginManager()
 
 
-def crear_app():
+def crear_app(config=None):
     app = Flask(__name__)
 
-    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-key")
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///medicerca.db"
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    # Config por defecto
+    app.config.update({
+        "SECRET_KEY": "dev-secret-key",
+        "SQLALCHEMY_DATABASE_URI": "sqlite:///medicerca.db",
+        "SQLALCHEMY_TRACK_MODIFICATIONS": False,
+    })
+
+    # Overrides (tests, staging, etc.)
+    if config:
+        app.config.update(config)
 
     bd.init_app(app)
     gestor_login.init_app(app)
@@ -33,21 +37,15 @@ def crear_app():
     from app.rutas.autenticacion import bp_autenticacion
     app.register_blueprint(bp_autenticacion)
 
-    from app.rutas.principal import bp_principal       # Arturo - Feature 1 y 2
+    from app.rutas.principal import bp_principal
     app.register_blueprint(bp_principal)
 
-    # ✅ Registrar blueprint de médicos (faltaba)
     from app.rutas.medicos import bp_medicos
     app.register_blueprint(bp_medicos)
 
-    from app.rutas.mapa import bp_mapa                 # Arturo - Features 3, 4 y 5
+    from app.rutas.mapa import bp_mapa
     app.register_blueprint(bp_mapa, url_prefix="/mapa")
-    # from app.rutas.busqueda import bp_busqueda          # Hugo
-    # app.register_blueprint(bp_busqueda, url_prefix="/busqueda")
-    # from app.rutas.perfil import bp_perfil              # Diego
-    # app.register_blueprint(bp_perfil, url_prefix="/perfil")
-    from app.rutas.resenas import bp_resenas
-    app.register_blueprint(bp_resenas)
-
+    # from app.rutas.resenas import bp_resenas
+    # app.register_blueprint(bp_resenas, url_prefix="/resenas")
 
     return app
