@@ -120,9 +120,7 @@
     .bg-\[\#3B82F6\]\/10.text-\[\#3B82F6\],
     .bg-white .text-\[\#3B82F6\],
     .bg-white\/80 .text-\[\#3B82F6\] { color: #1D4ED8 !important; }
-    .hero-readable {
-      text-shadow: 0 1px 0 rgba(255,255,255,.35);
-    }
+    .hero-readable { text-shadow: 0 1px 0 rgba(255,255,255,.35); }
     html.dark .bg-white,
     html.dark [class*="bg-white/"] {
       background-color: rgba(15,23,42,.82) !important;
@@ -179,17 +177,10 @@
     html.dark .leaflet-popup-content-wrapper,
     html.dark .leaflet-popup-tip { background: #0f172a; color: #E5EEF9; }
     .scroll-progress {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 3px;
-      z-index: 70;
-      background: transparent;
+      position: fixed; top: 0; left: 0; width: 100%; height: 3px; z-index: 70; background: transparent;
     }
     .scroll-progress__bar {
-      width: 0;
-      height: 100%;
+      width: 0; height: 100%;
       background: linear-gradient(90deg, var(--mc-primary), var(--mc-secondary));
       box-shadow: 0 0 18px rgba(59,130,246,.45);
       transition: width .08s linear;
@@ -219,6 +210,12 @@
     <div class="hidden md:flex items-center gap-1 glass-card rounded-2xl px-2 py-1 shadow-card">
       <a href="{{ url_for('medicos.lista_medicos') }}" class="px-3.5 py-2 rounded-xl text-sm font-medium text-#E9F2FC dark:text-slate-300 hover:text-[#3B82F6] hover:bg-white/80 dark:hover:bg-slate-800 transition-all duration-200">Médicos</a>
       <a href="{{ url_for('mapa.mapa_medicos') }}" class="px-3.5 py-2 rounded-xl text-sm font-medium text-#E9F2FC dark:text-slate-300 hover:text-[#3B82F6] hover:bg-white/80 dark:hover:bg-slate-800 transition-all duration-200">Mapa</a>
+      {% if current_user.is_authenticated and current_user.rol == 'admin' %}
+      <a href="{{ url_for('admin.dashboard') }}" class="px-3.5 py-2 rounded-xl text-sm font-medium text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-slate-800 transition-all duration-200 flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-red-400 inline-block"></span>
+        Admin
+      </a>
+      {% endif %}
     </div>
 
     <div class="flex items-center gap-2">
@@ -252,6 +249,12 @@
       </button>
       <a href="{{ url_for('medicos.lista_medicos') }}" class="px-4 py-3 rounded-2xl text-sm font-medium text-slate-600 dark:text-slate-200 hover:text-[#3B82F6] hover:bg-white/70 dark:hover:bg-slate-800 transition-all duration-200">Médicos</a>
       <a href="{{ url_for('mapa.mapa_medicos') }}" class="px-4 py-3 rounded-2xl text-sm font-medium text-slate-600 dark:text-slate-200 hover:text-[#3B82F6] hover:bg-white/70 dark:hover:bg-slate-800 transition-all duration-200">Mapa</a>
+      {% if current_user.is_authenticated and current_user.rol == 'admin' %}
+      <a href="{{ url_for('admin.dashboard') }}" class="px-4 py-3 rounded-2xl text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-slate-800 transition-all duration-200 flex items-center gap-2">
+        <span class="w-1.5 h-1.5 rounded-full bg-red-400 inline-block"></span>
+        Panel Admin
+      </a>
+      {% endif %}
       {% if current_user.is_authenticated %}
         <a href="{{ url_for('principal.panel') }}" class="px-4 py-3 rounded-2xl text-sm font-medium text-slate-600 dark:text-slate-200 hover:text-[#3B82F6] hover:bg-white/70 dark:hover:bg-slate-800 transition-all duration-200">Mi Panel</a>
         <a href="{{ url_for('autenticacion.cerrar_sesion') }}" class="px-4 py-3 rounded-2xl text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-slate-800 transition-all duration-200">Salir</a>

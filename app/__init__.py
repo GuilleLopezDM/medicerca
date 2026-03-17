@@ -52,4 +52,7 @@ def crear_app(config=None):
     from app.rutas.resenas import bp_resenas
     app.register_blueprint(bp_resenas, url_prefix="/resenas")
 
+    from app.rutas.admin import bp_admin
+    app.register_blueprint(bp_admin)
+
     return app
