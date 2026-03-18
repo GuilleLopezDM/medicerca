@@ -63,8 +63,8 @@
         </div>
 
         <div class="grid sm:grid-cols-3 gap-3 mt-6 pt-6 border-t border-gray-100 dark:border-slate-700">
-          <a href="{{ url_for('medicos.detalle_medico', medico_id=current_user.perfil_medico.id) }}" class="inline-flex items-center justify-center gap-2 bg-[#3B82F6] text-white font-semibold text-sm px-5 py-3 rounded-2xl hover:bg-[#60A5FA] hover:-translate-y-0.5 transition-all duration-200">Ver perfil</a>
-          <a href="{{ url_for('medicos.editar_medico', medico_id=current_user.perfil_medico.id) }}" class="inline-flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-200 font-medium text-sm px-5 py-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-200">Editar datos</a>
+          <a href="{{ url_for('medicos.detalle', medico_id=current_user.perfil_medico.id) }}" class="inline-flex items-center justify-center gap-2 bg-[#3B82F6] text-white font-semibold text-sm px-5 py-3 rounded-2xl hover:bg-[#60A5FA] hover:-translate-y-0.5 transition-all duration-200">Ver perfil</a>
+          <a href="{{ url_for('medicos.editar', medico_id=current_user.perfil_medico.id) }}" class="inline-flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-200 font-medium text-sm px-5 py-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-200">Editar datos</a>
           <a href="{{ url_for('mapa.mapa_medicos') }}" class="inline-flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-200 font-medium text-sm px-5 py-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-200">Ver en mapa</a>
         </div>
       </section>
@@ -74,7 +74,7 @@
         <h2 class="text-2xl font-bold text-[#1F2937] dark:text-slate-100 mb-2">Creá tu perfil médico</h2>
         <p class="text-sm text-slate-500 dark:text-slate-400 max-w-2xl mb-6">Completá tus datos profesionales para aparecer en el directorio, mejorar tu visibilidad y permitir que los pacientes te encuentren fácilmente.</p>
         <div class="flex flex-wrap gap-3">
-          <a href="{{ url_for('medicos.registrar_medico') }}" class="inline-flex items-center gap-2 bg-[#3B82F6] text-white font-semibold text-sm px-5 py-3 rounded-2xl hover:bg-[#60A5FA] hover:-translate-y-0.5 transition-all duration-200">Crear perfil</a>
+          <a href="{{ url_for('medicos.registrar') }}" class="inline-flex items-center gap-2 bg-[#3B82F6] text-white font-semibold text-sm px-5 py-3 rounded-2xl hover:bg-[#60A5FA] hover:-translate-y-0.5 transition-all duration-200">Crear perfil</a>
           <span class="inline-flex items-center px-4 py-3 rounded-2xl text-sm text-slate-500 dark:text-slate-400 bg-white/70 dark:bg-slate-900/60 border border-white/80 dark:border-slate-700">Tiempo estimado: menos de 5 minutos</span>
         </div>
       </section>
@@ -104,7 +104,7 @@
         <li class="flex items-start gap-2"><span class="mt-1 w-1.5 h-1.5 rounded-full bg-[#3B82F6]"></span><span>Barra superior de progreso para acompañar el scroll en páginas largas.</span></li>
       </ul>
       {% if current_user.rol == 'medico' and not current_user.perfil_medico %}
-      <a href="{{ url_for('medicos.registrar_medico') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-[#3B82F6] hover:underline">Completar perfil ahora</a>
+      <a href="{{ url_for('medicos.registrar') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-[#3B82F6] hover:underline">Completar perfil ahora</a>
       {% else %}
       <a href="{{ url_for('principal.inicio') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-[#3B82F6] hover:underline">Volver al inicio</a>
       {% endif %}
