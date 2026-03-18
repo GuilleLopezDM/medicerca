@@ -9,7 +9,7 @@
   <nav class="flex items-center gap-2 text-xs text-gray-400 font-medium mb-8">
     <a href="{{ url_for('principal.panel') }}" class="hover:text-[#3B82F6] transition-colors duration-150">Panel</a>
     <span class="text-gray-300">›</span>
-    <a href="{{ url_for('medicos.detalle_medico', medico_id=medico.id) }}" class="hover:text-[#3B82F6] transition-colors duration-150 truncate max-w-[120px]">{{ medico.usuario.nombre }}</a>
+    <a href="{{ url_for('medicos.detalle', medico_id=medico.id) }}" class="hover:text-[#3B82F6] transition-colors duration-150 truncate max-w-[120px]">{{ medico.usuario.nombre }}</a>
     <span class="text-gray-300">›</span>
     <span class="text-gray-600">Editar</span>
   </nav>
@@ -24,7 +24,7 @@
         <p class="text-sm text-gray-500 mt-1">Los cambios se reflejarán en tu perfil público.</p>
       </div>
 
-      <form method="POST" action="{{ url_for('medicos.editar_medico', medico_id=medico.id) }}" class="space-y-10">
+      <form method="POST" action="{{ url_for('medicos.editar', medico_id=medico.id) }}" class="space-y-10">
 
         <!-- Section 1 -->
         <div>
@@ -130,7 +130,7 @@
                          active:scale-[0.98] transition-all duration-200">
             Guardar cambios
           </button>
-          <a href="{{ url_for('medicos.detalle_medico', medico_id=medico.id) }}"
+          <a href="{{ url_for('medicos.detalle', medico_id=medico.id) }}"
              class="px-5 py-3 rounded-xl border border-gray-200 text-sm font-medium text-gray-500
                     hover:border-gray-300 hover:bg-gray-50 transition-all duration-200">
             Cancelar

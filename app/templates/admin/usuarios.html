@@ -87,20 +87,29 @@
             <td class="px-6 py-4 text-gray-500 text-xs">{{ u.correo }}</td>
 
             <td class="px-6 py-4">
-              <!-- Cambio de rol rápido -->
-              <form method="POST" action="{{ url_for('admin.cambiar_rol', usuario_id=u.id) }}">
-                <select name="rol" onchange="this.form.submit()"
-                        {% if u.id == current_user.id %}disabled{% endif %}
-                        class="px-2 py-1 border rounded-lg text-xs font-semibold outline-none transition-all
-                               {% if u.rol == 'admin' %}bg-red-50 text-red-500 border-red-100
-                               {% elif u.rol == 'medico' %}bg-blue-50 text-[#3B82F6] border-blue-100
-                               {% else %}bg-green-50 text-green-600 border-green-100{% endif %}
-                               {% if u.id == current_user.id %}opacity-50 cursor-not-allowed{% endif %}">
-                  <option value="paciente" {% if u.rol == 'paciente' %}selected{% endif %}>paciente</option>
-                  <option value="medico"   {% if u.rol == 'medico'   %}selected{% endif %}>médico</option>
-                  <option value="admin"    {% if u.rol == 'admin'    %}selected{% endif %}>admin</option>
-                </select>
-              </form>
+              {% if u.id == current_user.id %}
+                <!-- Tu propio rol: solo lectura, no se puede cambiar -->
+                <span class="px-2 py-1 border rounded-lg text-xs font-semibold cursor-not-allowed
+                             {% if u.rol == 'admin' %}bg-red-50 text-red-500 border-red-100
+                             {% elif u.rol == 'medico' %}bg-blue-50 text-[#3B82F6] border-blue-100
+                             {% else %}bg-green-50 text-green-600 border-green-100{% endif %}">
+                  {{ u.rol }}
+                  <span class="ml-1 opacity-50">🔒</span>
+                </span>
+              {% else %}
+                <!-- Cambio de rol rápido para otros usuarios -->
+                <form method="POST" action="{{ url_for('admin.cambiar_rol', usuario_id=u.id) }}">
+                  <select name="rol" onchange="this.form.submit()"
+                          class="px-2 py-1 border rounded-lg text-xs font-semibold outline-none transition-all cursor-pointer
+                                 {% if u.rol == 'admin' %}bg-red-50 text-red-500 border-red-100
+                                 {% elif u.rol == 'medico' %}bg-blue-50 text-[#3B82F6] border-blue-100
+                                 {% else %}bg-green-50 text-green-600 border-green-100{% endif %}">
+                    <option value="paciente" {% if u.rol == 'paciente' %}selected{% endif %}>paciente</option>
+                    <option value="medico"   {% if u.rol == 'medico'   %}selected{% endif %}>médico</option>
+                    <option value="admin"    {% if u.rol == 'admin'    %}selected{% endif %}>admin</option>
+                  </select>
+                </form>
+              {% endif %}
             </td>
 
             <td class="px-6 py-4 text-gray-400 text-xs">{{ u.creado_en.strftime('%d/%m/%Y') }}</td>

@@ -138,7 +138,10 @@ def procesar_editar_usuario(usuario_id):
 
     usuario.nombre = nombre
     usuario.correo = correo
-    usuario.rol    = rol
+
+    # No permitir que el admin cambie su propio rol
+    if usuario.id != current_user.id:
+        usuario.rol = rol
 
     if contrasena:
         usuario.establecer_contrasena(contrasena)

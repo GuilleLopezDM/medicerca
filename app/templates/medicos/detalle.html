@@ -51,7 +51,7 @@
         <!-- Actions -->
         <div class="flex flex-wrap gap-2.5 flex-shrink-0">
           {% if current_user.is_authenticated and current_user.id == medico.usuario_id %}
-          <a href="{{ url_for('medicos.editar_medico', medico_id=medico.id) }}"
+          <a href="{{ url_for('medicos.editar', medico_id=medico.id) }}"
              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#3B82F6] text-white font-semibold text-sm
                     hover:bg-[#60A5FA] hover:scale-[1.02] hover:shadow-[0_4px_12px_rgba(59,130,246,0.24)]
                     active:scale-[0.98] transition-all duration-200">
