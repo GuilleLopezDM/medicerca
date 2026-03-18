@@ -7,7 +7,7 @@ Panel de administración — solo accesible para usuarios con rol='admin'.
 from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
 from flask_login import login_required, current_user
 from functools import wraps
-from app import bd
+from app.extensions import bd
 from app.models.models import Usuario, Medico, Resena
 from app.services.email_service import get_email_service
 

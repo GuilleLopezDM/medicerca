@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Nueva contraseña - MediCerca{% endblock %}
+{% block content %}
+<div class="container py-5" style="max-width: 520px;">
+  <div class="card shadow-sm border-0 rounded-4">
+    <div class="card-body p-4">
+      <h1 class="h3 mb-3">Crear nueva contraseña</h1>
+      <form method="post">
+        <div class="mb-3">
+          <label for="contrasena" class="form-label">Nueva contraseña</label>
+          <input type="password" class="form-control" id="contrasena" name="contrasena" minlength="8" required>
+        </div>
+        <div class="mb-3">
+          <label for="confirmar" class="form-label">Confirmar contraseña</label>
+          <input type="password" class="form-control" id="confirmar" name="confirmar" minlength="8" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Actualizar contraseña</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

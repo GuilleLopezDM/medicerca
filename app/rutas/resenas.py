@@ -5,7 +5,7 @@
 
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
-from app import bd
+from app.extensions import bd
 from app.models import Resena, Medico  # Descomentar cuando Hugo termine
 from sqlalchemy import func  # se  agrego func para pensar en el promedio
 

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Recuperar contraseña - MediCerca{% endblock %}
+{% block content %}
+<div class="container py-5" style="max-width: 520px;">
+  <div class="card shadow-sm border-0 rounded-4">
+    <div class="card-body p-4">
+      <h1 class="h3 mb-3">Recuperar contraseña</h1>
+      <p class="text-muted">Ingresá tu correo y te enviaremos un enlace para restablecerla.</p>
+      <form method="post">
+        <div class="mb-3">
+          <label for="correo" class="form-label">Correo electrónico</label>
+          <input type="email" class="form-control" id="correo" name="correo" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Enviar enlace</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

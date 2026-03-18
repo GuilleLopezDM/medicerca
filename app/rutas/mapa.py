@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, jsonify, request, flash, redirect, url_for, abort
 from flask_login import login_required, current_user
-from app import bd
+from app.extensions import bd
 from app.models.models import Medico
 
 bp_mapa = Blueprint("mapa", __name__)
