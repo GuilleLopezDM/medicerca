@@ -10,7 +10,7 @@
 
 | Feature | Descripción |
 |---|---|
-| 🔍 **Directorio de médicos** | Búsqueda y filtros por especialidad, ciudad y universidad |
+| 🔍 **Directorio de médicos** | Búsqueda y filtros por especialidad y ciudad |
 | 🗺️ **Mapa interactivo** | Leaflet.js con marcadores de consultorios y preview al clickear |
 | 📍 **Ubicación del consultorio** | El médico ubica su consultorio clickeando en el mapa |
 | ⭐ **Rating y reseñas** | Sistema de 1-5 estrellas con recálculo automático de promedio |

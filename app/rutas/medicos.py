@@ -14,8 +14,6 @@ def lista_medicos():
     busqueda = request.args.get('busqueda')
     especialidad = request.args.get('especialidad')
     ciudad = request.args.get('ciudad')
-    universidad = request.args.get('universidad')
-    verificados = request.args.get('verificados')
 
     # Feature 1 — Búsqueda general
     if busqueda:
@@ -31,12 +29,6 @@ def lista_medicos():
 
     if ciudad:
         query = query.filter(Medico.ciudad.ilike(f"%{ciudad}%"))
-
-    if universidad:
-        query = query.filter(Medico.universidad_graduacion.ilike(f"%{universidad}%"))
-
-    if verificados == "1":
-        query = query.filter(Medico.verificado == True)
 
     medicos = query.all()
 

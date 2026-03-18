@@ -123,14 +123,12 @@ def procesar_editar_usuario(usuario_id):
 
     nombre     = request.form.get("nombre", "").strip()
     correo     = request.form.get("correo", "").strip()
-    rol        = request.form.get("rol", usuario.rol)
     contrasena = request.form.get("contrasena", "").strip()
 
     if not nombre or not correo:
         flash("Nombre y correo son obligatorios.", "danger")
         return redirect(url_for("admin.editar_usuario", usuario_id=usuario_id))
 
-    # Verificar que el correo no lo use otro usuario
     existente = Usuario.query.filter_by(correo=correo).first()
     if existente and existente.id != usuario.id:
         flash("Ese correo ya está en uso por otro usuario.", "danger")
@@ -139,16 +137,101 @@ def procesar_editar_usuario(usuario_id):
     usuario.nombre = nombre
     usuario.correo = correo
 
-    # No permitir que el admin cambie su propio rol
-    if usuario.id != current_user.id:
-        usuario.rol = rol
-
     if contrasena:
         usuario.establecer_contrasena(contrasena)
 
     bd.session.commit()
     flash(f"Usuario {nombre} actualizado correctamente.", "success")
     return redirect(url_for("admin.listar_usuarios"))
+
+
+# ── Editar usuario completo (usuario + médico si aplica) ─────────────────
+@bp_admin.get("/usuarios/<int:usuario_id>/editar-completo")
+@login_required
+@solo_admin
+def editar_completo_usuario(usuario_id):
+    usuario = Usuario.query.get_or_404(usuario_id)
+    medico = usuario.perfil_medico
+    resenas = []
+    if medico:
+        resenas = Resena.query.filter_by(medico_id=medico.id).all()
+    return render_template("admin/editar_completo.html", usuario=usuario, medico=medico, resenas=resenas)
+
+
+@bp_admin.post("/usuarios/<int:usuario_id>/editar-completo")
+@login_required
+@solo_admin
+def procesar_editar_completo_usuario(usuario_id):
+    usuario = Usuario.query.get_or_404(usuario_id)
+    medico = usuario.perfil_medico
+
+    # Actualizar usuario (sin tocar el rol)
+    usuario.nombre = request.form.get('nombre', usuario.nombre)
+    usuario.correo = request.form.get('correo', usuario.correo)
+    contrasena = request.form.get('contrasena')
+    if contrasena:
+        usuario.establecer_contrasena(contrasena)
+
+    # Actualizar médico si existe
+    if medico:
+        medico.especialidad           = request.form.get('especialidad', medico.especialidad)
+        medico.numero_matricula       = request.form.get('numero_matricula', medico.numero_matricula)
+        medico.hospital               = request.form.get('hospital', medico.hospital)
+        medico.ciudad                 = request.form.get('ciudad', medico.ciudad)
+        medico.telefono               = request.form.get('telefono', medico.telefono)
+        medico.biografia              = request.form.get('biografia', medico.biografia)
+        medico.universidad_graduacion = request.form.get('universidad_graduacion', medico.universidad_graduacion)
+        medico.anios_experiencia      = request.form.get('anios_experiencia', type=int) if request.form.get('anios_experiencia') else medico.anios_experiencia
+        medico.verificado             = request.form.get('verificado') == 'on'
+        medico.latitud                = request.form.get('latitud', type=float) if request.form.get('latitud') else medico.latitud
+        medico.longitud               = request.form.get('longitud', type=float) if request.form.get('longitud') else medico.longitud
+        medico.direccion_consultorio  = request.form.get('direccion_consultorio', medico.direccion_consultorio)
+
+    bd.session.commit()
+    flash(f"Usuario {usuario.nombre} actualizado correctamente.", "success")
+    return redirect(url_for("admin.listar_usuarios"))
+
+
+# ── Seleccionar ubicación para médico (admin) ──
+@bp_admin.get("/medicos/<int:medico_id>/ubicacion")
+@login_required
+@solo_admin
+def seleccionar_ubicacion_admin(medico_id):
+    medico = Medico.query.get_or_404(medico_id)
+    return render_template("admin/seleccionar_ubicacion.html", medico=medico)
+
+
+@bp_admin.post("/medicos/<int:medico_id>/guardar-ubicacion")
+@login_required
+@solo_admin
+def guardar_ubicacion_admin(medico_id):
+    medico = Medico.query.get_or_404(medico_id)
+
+    medico.latitud               = request.form.get("latitud", type=float)
+    medico.longitud              = request.form.get("longitud", type=float)
+    medico.direccion_consultorio = request.form.get("direccion_consultorio", "")
+
+    bd.session.commit()
+    flash("Ubicación guardada correctamente.", "success")
+    return redirect(url_for("admin.editar_completo_usuario", usuario_id=medico.usuario_id))
+
+
+# ── Eliminar reseña individual ─────────────────
+@bp_admin.post("/resenas/<int:resena_id>/eliminar")
+@login_required
+@solo_admin
+def eliminar_resena_admin(resena_id):
+    resena = Resena.query.get_or_404(resena_id)
+    medico_id = resena.medico_id
+
+    bd.session.delete(resena)
+    bd.session.commit()
+
+    from app.rutas.resenas import recalcular_calificacion
+    recalcular_calificacion(medico_id)
+
+    flash("Reseña eliminada correctamente.", "info")
+    return redirect(request.referrer or url_for("admin.listar_usuarios"))
 
 
 # ── Eliminar usuario ───────────────────────────
@@ -162,31 +245,18 @@ def eliminar_usuario(usuario_id):
         flash("No podés eliminar tu propia cuenta.", "danger")
         return redirect(url_for("admin.listar_usuarios"))
 
+    # 1. Reseñas escritas por este usuario (como autor/paciente)
+    Resena.query.filter_by(usuario_id=usuario.id).delete()
+
+    # 2. Reseñas recibidas en su perfil médico + perfil médico
+    if usuario.perfil_medico:
+        Resena.query.filter_by(medico_id=usuario.perfil_medico.id).delete()
+        bd.session.delete(usuario.perfil_medico)
+
+    # 3. El usuario
     nombre = usuario.nombre
     bd.session.delete(usuario)
     bd.session.commit()
 
-    flash(f"Usuario {nombre} eliminado.", "success")
-    return redirect(url_for("admin.listar_usuarios"))
-
-
-# ── Cambiar rol rápido ─────────────────────────
-@bp_admin.post("/usuarios/<int:usuario_id>/rol")
-@login_required
-@solo_admin
-def cambiar_rol(usuario_id):
-    usuario = Usuario.query.get_or_404(usuario_id)
-
-    if usuario.id == current_user.id:
-        flash("No podés cambiar tu propio rol.", "danger")
-        return redirect(url_for("admin.listar_usuarios"))
-
-    nuevo_rol = request.form.get("rol", "paciente")
-    if nuevo_rol not in ("paciente", "medico", "admin"):
-        flash("Rol inválido.", "danger")
-        return redirect(url_for("admin.listar_usuarios"))
-
-    usuario.rol = nuevo_rol
-    bd.session.commit()
-    flash(f"Rol de {usuario.nombre} cambiado a '{nuevo_rol}'.", "success")
+    flash(f"Usuario {nombre} y datos asociados eliminados.", "success")
     return redirect(url_for("admin.listar_usuarios"))
