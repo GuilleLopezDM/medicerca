@@ -62,6 +62,13 @@ def registrar():
         return redirect(url_for('medicos.detalle', medico_id=current_user.perfil_medico.id))
 
     if request.method == "POST":
+        numero_matricula = request.form.get('numero_matricula', '').strip()
+
+        # Validar matrícula duplicada
+        if Medico.query.filter_by(numero_matricula=numero_matricula).first():
+            flash("Ya existe un médico registrado con esa matrícula.", "danger")
+            return redirect(url_for('medicos.registrar'))
+
         imagen = request.files.get("imagen_perfil")
         nombre_imagen = guardar_imagen(imagen)
 
@@ -71,7 +78,7 @@ def registrar():
         nuevo_medico = Medico(
             usuario_id=current_user.id,
             especialidad=request.form.get('especialidad'),
-            numero_matricula=request.form.get('numero_matricula'),
+            numero_matricula=numero_matricula,
             hospital=request.form.get('hospital'),
             ciudad=request.form.get('ciudad'),
             telefono=request.form.get('telefono'),
@@ -105,13 +112,24 @@ def editar(medico_id):
         if nombre_imagen:
             medico.usuario.imagen_perfil = nombre_imagen
 
-        medico.especialidad = request.form.get('especialidad')
-        medico.hospital = request.form.get('hospital')
-        medico.ciudad = request.form.get('ciudad')
-        medico.telefono = request.form.get('telefono')
-        medico.biografia = request.form.get('biografia')
-        medico.universidad_graduacion = request.form.get('universidad_graduacion')
-        medico.anios_experiencia = request.form.get('anios_experiencia', type=int)
+        medico.especialidad            = request.form.get('especialidad')
+        medico.hospital                = request.form.get('hospital')
+        medico.ciudad                  = request.form.get('ciudad')
+        medico.telefono                = request.form.get('telefono')
+        medico.biografia               = request.form.get('biografia')
+        medico.universidad_graduacion  = request.form.get('universidad_graduacion')
+        medico.anios_experiencia       = request.form.get('anios_experiencia', type=int)
+
+        # Ubicación del consultorio
+        lat = request.form.get('latitud', type=float)
+        lng = request.form.get('longitud', type=float)
+        if lat is not None:
+            medico.latitud = lat
+        if lng is not None:
+            medico.longitud = lng
+        direccion = request.form.get('direccion_consultorio', '').strip()
+        if direccion:
+            medico.direccion_consultorio = direccion
 
         bd.session.commit()
         flash("Perfil actualizado correctamente.", "success")

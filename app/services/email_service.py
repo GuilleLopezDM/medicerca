@@ -120,10 +120,9 @@ class EmailService:
 </body></html>"""
 
     # ─────────────────────────────────────────
-    # 1. BIENVENIDA (cuenta creada)
+    # 1a. BIENVENIDA PACIENTE
     # ─────────────────────────────────────────
     def enviar_bienvenida(self, email: str, nombre: str) -> tuple[bool, str]:
-        url = f"{self.app_url}/auth/iniciar-sesion"
         cuerpo = f"""
         <h2 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#252529;">
           ¡Bienvenido/a a MediCerca, {nombre}! 🎉
@@ -131,7 +130,7 @@ class EmailService:
         <p style="margin:0 0 16px;font-size:15px;color:#6b7280;line-height:1.6;">
           Tu cuenta fue creada exitosamente. Ya podés acceder a todos los servicios
           de MediCerca: encontrá médicos verificados cerca tuyo, leé reseñas y
-          agendá turnos de forma rápida y segura.
+          encontrá consultorios de forma rápida y segura.
         </p>
 
         <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;
@@ -147,17 +146,6 @@ class EmailService:
           </p>
         </div>
 
-        <table width="100%" cellpadding="0" cellspacing="0">
-          <tr><td align="center" style="padding:8px 0 28px;">
-            <a href="{url}"
-               style="display:inline-block;background:#8BF57A;color:#252529;
-                      font-size:15px;font-weight:700;text-decoration:none;
-                      padding:14px 32px;border-radius:12px;">
-              Ir a MediCerca →
-            </a>
-          </td></tr>
-        </table>
-
         <p style="margin:0;font-size:13px;color:#9ca3af;text-align:center;">
           Si no creaste esta cuenta, ignorá este mensaje.
         </p>"""
@@ -167,6 +155,52 @@ class EmailService:
         msg["From"]    = formataddr((self.from_name, self.email_user))
         msg["To"]      = email
         msg.attach(MIMEText(self._html("Bienvenido/a a MediCerca", cuerpo), "html"))
+        return self._send(msg)
+
+    # ─────────────────────────────────────────
+    # 1b. BIENVENIDA MÉDICO
+    # ─────────────────────────────────────────
+    def enviar_bienvenida_medico(self, email: str, nombre: str) -> tuple[bool, str]:
+        cuerpo = f"""
+        <h2 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#252529;">
+          ¡Bienvenido/a a MediCerca, Dr/a. {nombre}! 👨‍⚕️
+        </h2>
+        <p style="margin:0 0 16px;font-size:15px;color:#6b7280;line-height:1.6;">
+          Tu cuenta médica fue creada exitosamente. El próximo paso es completar
+          tu perfil profesional para aparecer en el directorio y en el mapa de MediCerca.
+        </p>
+
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;
+                    padding:18px 20px;margin-bottom:24px;">
+          <p style="margin:0 0 8px;font-size:13px;font-weight:700;color:#1e40af;">
+            Pasos para activar tu perfil
+          </p>
+          <p style="margin:0;font-size:13px;color:#1d4ed8;line-height:1.8;">
+            1️⃣ Iniciá sesión con tu correo y contraseña<br/>
+            2️⃣ Completá tu perfil médico (especialidad, matrícula, hospital)<br/>
+            3️⃣ Marcá tu consultorio en el mapa<br/>
+            4️⃣ Esperá la verificación del equipo de MediCerca ✅
+          </p>
+        </div>
+
+        <div style="background:#fefce8;border:1px solid #fde68a;border-radius:12px;
+                    padding:14px 16px;margin-bottom:24px;">
+          <p style="margin:0;font-size:13px;color:#92400e;line-height:1.6;">
+            ⚠️ <strong>Importante:</strong> tu perfil no será visible en el directorio
+            hasta que completes la información y sea verificado por nuestro equipo.
+          </p>
+        </div>
+
+        <p style="margin:0;font-size:13px;color:#9ca3af;text-align:center;">
+          Si no creaste esta cuenta, ignorá este mensaje o contactanos a
+          <a href="mailto:{self.support_email}" style="color:#3B82F6;">{self.support_email}</a>
+        </p>"""
+
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = "👨‍⚕️ Tu cuenta médica en MediCerca está lista"
+        msg["From"]    = formataddr((self.from_name, self.email_user))
+        msg["To"]      = email
+        msg.attach(MIMEText(self._html("Bienvenido/a a MediCerca — Médico", cuerpo), "html"))
         return self._send(msg)
 
     # ─────────────────────────────────────────
