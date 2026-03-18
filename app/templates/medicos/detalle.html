@@ -5,20 +5,24 @@
 
 <div class="max-w-4xl mx-auto px-4 md:px-8 py-10 space-y-5">
 
-  <!-- ━━ HERO CARD ━━ -->
   <div class="bg-white rounded-2xl border border-gray-100/80 shadow-card overflow-hidden">
-
     <div class="h-1 bg-gradient-to-r from-[#3B82F6] via-[#60A5FA] to-[#F0F9FF]"></div>
 
     <div class="p-6 md:p-8">
       <div class="flex flex-col sm:flex-row sm:items-start gap-6">
 
-        <!-- Avatar -->
-        <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#F0F9FF] to-[#60A5FA] flex items-center justify-center text-4xl flex-shrink-0 shadow-sm">
-          👨‍⚕️
+        <div class="flex-shrink-0">
+          {% if medico.usuario.imagen_perfil %}
+            <img src="{{ url_for('static', filename='uploads/' ~ medico.usuario.imagen_perfil) }}"
+                 alt="Foto de {{ medico.usuario.nombre }}"
+                 class="w-20 h-20 rounded-2xl object-cover border border-gray-200 shadow-sm">
+          {% else %}
+            <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#F0F9FF] to-[#60A5FA] flex items-center justify-center text-4xl shadow-sm">
+              👨‍⚕️
+            </div>
+          {% endif %}
         </div>
 
-        <!-- Info -->
         <div class="flex-1 min-w-0">
           <div class="flex flex-wrap items-center gap-2.5 mb-1">
             <h1 class="text-2xl font-bold tracking-tight text-[#1F2937]">
@@ -47,7 +51,6 @@
           </div>
         </div>
 
-        <!-- Actions -->
         <div class="flex flex-wrap gap-2.5 flex-shrink-0">
           {% if current_user.is_authenticated and current_user.id == medico.usuario_id %}
           <a href="{{ url_for('medicos.editar', medico_id=medico.id) }}"
@@ -64,7 +67,7 @@
           {% if medico.latitud %}
           <a href="{{ url_for('mapa.mapa_medicos') }}#medico-{{ medico.id }}"
              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-medium text-sm
-                    hover:border-[#3B82F6] hover:text-[#3B82F6] hover:bg-[#F0F9FF] hover:scale-[1.02]
+                    hover:border-gray-300 hover:bg-gray-50 hover:scale-[1.02]
                     active:scale-[0.98] transition-all duration-200">
             🗺️ Ver en mapa
           </a>
@@ -75,11 +78,8 @@
     </div>
   </div>
 
-
-  <!-- ━━ CONTENT GRID ━━ -->
   <div class="grid md:grid-cols-2 gap-5">
 
-    <!-- Información profesional -->
     <div class="bg-white rounded-2xl border border-gray-100/80 shadow-card p-6">
       <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-5">
         Información profesional
@@ -115,7 +115,6 @@
       </div>
     </div>
 
-    <!-- Calificación -->
     <div class="bg-white rounded-2xl border border-gray-100/80 shadow-card p-6 flex flex-col justify-between">
       <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-5">Calificación</h2>
       <div class="flex items-end gap-4 mb-4">
@@ -143,8 +142,6 @@
 
   </div>
 
-
-  <!-- ━━ UNIVERSIDAD + CONSULTORIO ━━ -->
   {% if medico.universidad_graduacion or medico.direccion_consultorio %}
   <div class="bg-white rounded-2xl border border-gray-100/80 shadow-card p-6">
     <div class="grid sm:grid-cols-2 gap-5">
@@ -164,8 +161,6 @@
   </div>
   {% endif %}
 
-
-  <!-- ━━ BIOGRAFÍA ━━ -->
   {% if medico.biografia %}
   <div class="bg-[#F0F9FF]/40 border border-[#F0F9FF] rounded-2xl p-6">
     <h2 class="text-sm font-bold text-[#3B82F6] uppercase tracking-widest mb-3">Sobre el médico</h2>
@@ -173,8 +168,6 @@
   </div>
   {% endif %}
 
-
-  <!-- ━━ RESEÑAS ━━ -->
   <div class="bg-white rounded-2xl border border-gray-100/80 shadow-card p-6 md:p-8">
 
     <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6">Reseñas de pacientes</h2>
@@ -217,9 +210,20 @@
       {% for resena in medico.resenas %}
       <div class="bg-white border border-gray-100 rounded-xl p-4 hover:border-gray-200 transition-colors duration-150">
         <div class="flex items-start justify-between mb-2">
-          <div>
-            <p class="text-sm font-semibold text-[#1F2937]">{{ resena.autor.nombre }}</p>
-            <p class="text-xs text-gray-400 mt-0.5">{{ resena.creado_en }}</p>
+          <div class="flex items-center gap-3">
+            {% if resena.autor.imagen_perfil %}
+              <img src="{{ url_for('static', filename='uploads/' ~ resena.autor.imagen_perfil) }}"
+                   alt="Foto de {{ resena.autor.nombre }}"
+                   class="w-10 h-10 rounded-full object-cover border border-gray-200">
+            {% else %}
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#3B82F6] to-[#60A5FA] text-white text-sm font-bold flex items-center justify-center">
+                {{ resena.autor.nombre[0] | upper }}
+              </div>
+            {% endif %}
+            <div>
+              <p class="text-sm font-semibold text-[#1F2937]">{{ resena.autor.nombre }}</p>
+              <p class="text-xs text-gray-400 mt-0.5">{{ resena.creado_en }}</p>
+            </div>
           </div>
           <div class="text-yellow-400 text-sm">
             {{ "★" * resena.puntuacion }}{{ "☆" * (5 - resena.puntuacion) }}

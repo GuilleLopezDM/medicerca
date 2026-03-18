@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
 from app import bd
 from app.models.models import Usuario
+from app.utils.uploads import guardar_imagen
 
 from app.utils.tokens import (
     generar_token_reset,
@@ -12,7 +13,6 @@ from app.services.email_service import get_email_service
 bp_autenticacion = Blueprint("autenticacion", __name__, url_prefix="/auth")
 
 
-# pagina de login
 @bp_autenticacion.get("/iniciar-sesion")
 def iniciar_sesion():
     if current_user.is_authenticated:
@@ -21,7 +21,6 @@ def iniciar_sesion():
     return render_template("autenticacion/iniciar_sesion.html")
 
 
-# procesar login
 @bp_autenticacion.post("/iniciar-sesion")
 def procesar_inicio_sesion():
     if current_user.is_authenticated:
@@ -46,7 +45,6 @@ def procesar_inicio_sesion():
     return redirect(url_for("autenticacion.iniciar_sesion"))
 
 
-# pagina de registro
 @bp_autenticacion.get("/registro")
 def registro():
     if current_user.is_authenticated:
@@ -55,7 +53,6 @@ def registro():
     return render_template("autenticacion/registro.html")
 
 
-# procesar registro
 @bp_autenticacion.post("/registro")
 def procesar_registro():
     if current_user.is_authenticated:
@@ -65,6 +62,7 @@ def procesar_registro():
     correo = request.form.get("correo", "").strip()
     contrasena = request.form.get("contrasena", "")
     rol = request.form.get("rol", "").strip()
+    imagen = request.files.get("imagen_perfil")
 
     usuario_existente = Usuario.query.filter_by(correo=correo).first()
 
@@ -72,18 +70,20 @@ def procesar_registro():
         flash("Ya existe una cuenta con ese correo.", "danger")
         return redirect(url_for("autenticacion.registro"))
 
+    nombre_imagen = guardar_imagen(imagen)
+
     nuevo_usuario = Usuario(
         nombre=nombre,
         correo=correo,
         rol=rol,
         email_verificado=True,
+        imagen_perfil=nombre_imagen,
     )
     nuevo_usuario.establecer_contrasena(contrasena)
 
     bd.session.add(nuevo_usuario)
     bd.session.commit()
 
-    # Enviar correo de bienvenida
     get_email_service().enviar_bienvenida(email=correo, nombre=nombre)
 
     login_user(nuevo_usuario)
@@ -91,7 +91,6 @@ def procesar_registro():
     return redirect(url_for("principal.inicio"))
 
 
-# logout
 @bp_autenticacion.get("/cerrar-sesion")
 @login_required
 def cerrar_sesion():
@@ -100,7 +99,6 @@ def cerrar_sesion():
     return redirect(url_for("principal.inicio"))
 
 
-# ── recuperar contraseña paso 1 (pedir email) ─────
 @bp_autenticacion.route("/recuperar", methods=["GET", "POST"])
 def recuperar_contrasena():
     if request.method == "POST":
@@ -124,7 +122,6 @@ def recuperar_contrasena():
     return render_template("autenticacion/recuperar_contrasena.html")
 
 
-# ── recuperar contraseña paso 2 (setear nueva) ────
 @bp_autenticacion.route("/nueva-contrasena/<token>", methods=["GET", "POST"])
 def nueva_contrasena(token):
     correo, error = verificar_token_reset(token)
@@ -138,7 +135,7 @@ def nueva_contrasena(token):
         return redirect(url_for("autenticacion.recuperar_contrasena"))
 
     if request.method == "POST":
-        nueva   = request.form.get("contrasena", "")
+        nueva = request.form.get("contrasena", "")
         repetir = request.form.get("confirmar", "")
 
         if len(nueva) < 8:

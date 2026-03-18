@@ -2,28 +2,26 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request,
 from flask_login import login_required, current_user
 from app import bd
 from app.models import Medico, Usuario
+from app.utils.uploads import guardar_imagen
 
 bp_medicos = Blueprint("medicos", __name__, url_prefix='/medicos')
 
-#F1 listamos medicos
+
 @bp_medicos.route("/")
 def lista_medicos():
     query = Medico.query.join(Usuario)
 
-    # Captura de filtros desde la URL
     busqueda = request.args.get('busqueda')
     especialidad = request.args.get('especialidad')
     ciudad = request.args.get('ciudad')
 
-    # Feature 1 — Búsqueda general
     if busqueda:
         query = query.filter(
-            (Usuario.nombre.ilike(f"%{busqueda}%")) | 
-            (Medico.especialidad.ilike(f"%{busqueda}%")) | 
+            (Usuario.nombre.ilike(f"%{busqueda}%")) |
+            (Medico.especialidad.ilike(f"%{busqueda}%")) |
             (Medico.hospital.ilike(f"%{busqueda}%"))
         )
 
-    # Feature 2 — Filtro por especialidad
     if especialidad:
         query = query.filter(Medico.especialidad.ilike(f"%{especialidad}%"))
 
@@ -36,15 +34,15 @@ def lista_medicos():
     ciudades = bd.session.query(Medico.ciudad).distinct().all()
 
     return render_template(
-        "medicos/lista.html", 
-        medicos=medicos, 
+        "medicos/lista.html",
+        medicos=medicos,
         especialidades=[e[0] for e in especialidades if e[0]],
         ciudades=[c[0] for c in ciudades if c[0]],
         total=len(medicos),
         filtros_actuales=request.args
     )
 
-#F2 detalle de un medico
+
 @bp_medicos.route("/<int:medico_id>")
 def detalle(medico_id):
     medico = bd.session.get(Medico, medico_id)
@@ -52,18 +50,24 @@ def detalle(medico_id):
         abort(404)
     return render_template("medicos/detalle.html", medico=medico)
 
-#F3 Formulario de registro medico — FEATURE 4: Guardar perfil médico
+
 @bp_medicos.route("/registrar", methods=["GET", "POST"])
 @login_required
 def registrar():
     if current_user.rol != 'medico':
         flash("Solo usuarios con rol 'médico' pueden crear un perfil profesional.", "warning")
         return redirect(url_for('principal.inicio'))
-    
+
     if current_user.perfil_medico:
         return redirect(url_for('medicos.detalle', medico_id=current_user.perfil_medico.id))
 
     if request.method == "POST":
+        imagen = request.files.get("imagen_perfil")
+        nombre_imagen = guardar_imagen(imagen)
+
+        if nombre_imagen:
+            current_user.imagen_perfil = nombre_imagen
+
         nuevo_medico = Medico(
             usuario_id=current_user.id,
             especialidad=request.form.get('especialidad'),
@@ -82,7 +86,7 @@ def registrar():
 
     return render_template("medicos/registrar.html")
 
-# TODO — FEATURE 5/6: Editar perfil
+
 @bp_medicos.route("/editar/<int:medico_id>", methods=["GET", "POST"])
 @login_required
 def editar(medico_id):
@@ -95,6 +99,12 @@ def editar(medico_id):
         return redirect(url_for('medicos.detalle', medico_id=medico.id))
 
     if request.method == "POST":
+        imagen = request.files.get("imagen_perfil")
+        nombre_imagen = guardar_imagen(imagen)
+
+        if nombre_imagen:
+            medico.usuario.imagen_perfil = nombre_imagen
+
         medico.especialidad = request.form.get('especialidad')
         medico.hospital = request.form.get('hospital')
         medico.ciudad = request.form.get('ciudad')
@@ -102,19 +112,18 @@ def editar(medico_id):
         medico.biografia = request.form.get('biografia')
         medico.universidad_graduacion = request.form.get('universidad_graduacion')
         medico.anios_experiencia = request.form.get('anios_experiencia', type=int)
-        medico.numero_matricula = request.form.get('numero_matricula')
-        
+
         bd.session.commit()
         flash("Perfil actualizado correctamente.", "success")
         return redirect(url_for('medicos.detalle', medico_id=medico.id))
 
     return render_template("medicos/editar.html", medico=medico)
 
-# --- FEATURE 5: MAPA DE MÉDICOS ---
+
 @bp_medicos.route("/mapa")
 def mapa_medicos():
     medicos_geolocalizados = Medico.query.filter(
-        Medico.latitud.isnot(None), 
+        Medico.latitud.isnot(None),
         Medico.longitud.isnot(None)
     ).join(Usuario).all()
     return render_template("medicos/mapa.html", medicos=medicos_geolocalizados)

@@ -203,13 +203,13 @@
       <span class="grid place-items-center w-10 h-10 rounded-2xl bg-white/90 dark:bg-slate-900 shadow-card">🩺</span>
       <div class="leading-tight">
         <span class="block text-base font-semibold tracking-tight">MediCerca</span>
-        <span class="hidden sm:block text-[11px] text-#E9F2FC dark:text-slate-400">Médicos verificados en Paraguay</span>
+        <span class="hidden sm:block text-[11px] text-slate-500 dark:text-slate-400">Médicos verificados en Paraguay</span>
       </div>
     </a>
 
     <div class="hidden md:flex items-center gap-1 glass-card rounded-2xl px-2 py-1 shadow-card">
-      <a href="{{ url_for('medicos.lista_medicos') }}" class="px-3.5 py-2 rounded-xl text-sm font-medium text-#E9F2FC dark:text-slate-300 hover:text-[#3B82F6] hover:bg-white/80 dark:hover:bg-slate-800 transition-all duration-200">Médicos</a>
-      <a href="{{ url_for('mapa.mapa_medicos') }}" class="px-3.5 py-2 rounded-xl text-sm font-medium text-#E9F2FC dark:text-slate-300 hover:text-[#3B82F6] hover:bg-white/80 dark:hover:bg-slate-800 transition-all duration-200">Mapa</a>
+      <a href="{{ url_for('medicos.lista_medicos') }}" class="px-3.5 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-[#3B82F6] hover:bg-white/80 dark:hover:bg-slate-800 transition-all duration-200">Médicos</a>
+      <a href="{{ url_for('mapa.mapa_medicos') }}" class="px-3.5 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-[#3B82F6] hover:bg-white/80 dark:hover:bg-slate-800 transition-all duration-200">Mapa</a>
       {% if current_user.is_authenticated and current_user.rol == 'admin' %}
       <a href="{{ url_for('admin.dashboard') }}" class="px-3.5 py-2 rounded-xl text-sm font-medium text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-slate-800 transition-all duration-200 flex items-center gap-1.5">
         <span class="w-1.5 h-1.5 rounded-full bg-red-400 inline-block"></span>
@@ -225,12 +225,20 @@
 
       {% if current_user.is_authenticated %}
         <a href="{{ url_for('principal.panel') }}" class="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-200 hover:text-[#3B82F6] hover:bg-white/70 dark:hover:bg-slate-800 transition-all duration-200">
-          <span class="w-7 h-7 rounded-full bg-[#F0F9FF] dark:bg-slate-800 inline-flex items-center justify-center text-xs font-semibold border border-slate-200/70 dark:border-slate-700">{{ current_user.nombre[0] | upper }}</span>
+          {% if current_user.imagen_perfil %}
+            <img src="{{ url_for('static', filename='uploads/' ~ current_user.imagen_perfil) }}"
+                 alt="Foto de perfil"
+                 class="w-8 h-8 rounded-full object-cover border border-slate-200/70 dark:border-slate-700">
+          {% else %}
+            <span class="w-8 h-8 rounded-full bg-[#F0F9FF] dark:bg-slate-800 inline-flex items-center justify-center text-xs font-semibold border border-slate-200/70 dark:border-slate-700">
+              {{ current_user.nombre[0] | upper }}
+            </span>
+          {% endif %}
           Mi Panel
         </a>
         <a href="{{ url_for('autenticacion.cerrar_sesion') }}" class="px-3.5 py-2 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-slate-800 transition-all duration-200">Salir</a>
       {% else %}
-        <a href="{{ url_for('autenticacion.iniciar_sesion') }}" class="hidden sm:inline-flex px-3.5 py-2 rounded-xl text-sm font-medium text-#E9F2FC dark:text-slate-300 hover:text-[#3B82F6] transition-all duration-200">Iniciar sesión</a>
+        <a href="{{ url_for('autenticacion.iniciar_sesion') }}" class="hidden sm:inline-flex px-3.5 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-[#3B82F6] transition-all duration-200">Iniciar sesión</a>
         <a href="{{ url_for('autenticacion.registro') }}" class="inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold bg-[#3B82F6] text-white hover:bg-[#60A5FA] hover:-translate-y-0.5 hover:shadow-glow active:translate-y-0 transition-all duration-200">Registrarse</a>
       {% endif %}
 
