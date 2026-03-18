@@ -84,7 +84,12 @@ def procesar_registro():
     bd.session.add(nuevo_usuario)
     bd.session.commit()
 
-    get_email_service().enviar_bienvenida(email=correo, nombre=nombre)
+    # Correo de bienvenida según rol
+    svc = get_email_service()
+    if rol == "medico":
+        svc.enviar_bienvenida_medico(email=correo, nombre=nombre)
+    else:
+        svc.enviar_bienvenida(email=correo, nombre=nombre)
 
     login_user(nuevo_usuario)
     flash("¡Cuenta creada exitosamente! Bienvenido/a a MediCerca.", "success")
