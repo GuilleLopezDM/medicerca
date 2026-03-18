@@ -9,7 +9,6 @@
 
   <div class="w-full max-w-md relative z-10 animate-slide-up">
 
-    <!-- Logo -->
     <div class="text-center mb-10">
       <a href="{{ url_for('principal.inicio') }}" class="inline-flex items-center gap-2.5 text-[#1F2937] dark:text-slate-100 hover:opacity-70 transition-opacity duration-200">
         <span class="text-2xl">🩺</span>
@@ -17,7 +16,6 @@
       </a>
     </div>
 
-    <!-- Card -->
     <div class="auth-card rounded-[1.75rem] p-8 md:p-9">
 
       <div class="mb-8">
@@ -25,7 +23,7 @@
         <p class="text-sm text-gray-500">Únite a la red de médicos verificados</p>
       </div>
 
-      <form method="POST" action="{{ url_for('autenticacion.registro') }}" class="space-y-4">
+      <form method="POST" action="{{ url_for('autenticacion.registro') }}" enctype="multipart/form-data" class="space-y-4">
 
         <div class="space-y-1.5">
           <label for="nombre" class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Nombre completo</label>
@@ -57,7 +55,15 @@
                         hover:border-gray-300 transition-all duration-200">
         </div>
 
-        <!-- Rol selector — pill style -->
+        <div class="space-y-1.5">
+          <label for="imagen_perfil" class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Foto de perfil <span class="normal-case font-normal text-gray-400">(opcional)</span></label>
+          <input type="file" id="imagen_perfil" name="imagen_perfil" accept=".png,.jpg,.jpeg,.webp"
+                 class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm text-[#1F2937]
+                        bg-gray-50/60 outline-none
+                        focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent focus:bg-white
+                        hover:border-gray-300 transition-all duration-200">
+        </div>
+
         <div class="space-y-1.5">
           <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Tipo de cuenta</label>
           <div class="grid grid-cols-2 gap-3">

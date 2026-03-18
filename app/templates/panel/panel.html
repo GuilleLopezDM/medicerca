@@ -7,17 +7,30 @@
   <section class="glass-card rounded-[2rem] shadow-card border border-white/50 p-6 md:p-8 mb-8 overflow-hidden relative">
     <div class="absolute inset-0 bg-gradient-to-br from-[#3B82F6]/8 via-transparent to-[#60A5FA]/10 pointer-events-none"></div>
     <div class="relative flex flex-col lg:flex-row lg:items-end justify-between gap-6">
-      <div>
-        <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400 mb-2">Panel personal</p>
-        <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-[#1F2937] dark:text-slate-100">Hola, {{ current_user.nombre }} 👋</h1>
-        <p class="text-sm md:text-base text-slate-500 dark:text-slate-400 mt-3 max-w-2xl">
-          {% if current_user.rol == 'medico' %}
-            Gestioná tu presencia profesional, revisá cómo se ve tu perfil y mantené tu información actualizada.
-          {% else %}
-            Explorá especialistas, guardá tu flujo de búsqueda y accedé rápido al directorio y al mapa.
-          {% endif %}
-        </p>
+      <div class="flex items-center gap-4">
+        {% if current_user.imagen_perfil %}
+          <img src="{{ url_for('static', filename='uploads/' ~ current_user.imagen_perfil) }}"
+               alt="Foto de perfil"
+               class="w-20 h-20 rounded-3xl object-cover border border-white/70 dark:border-slate-700 shadow-card">
+        {% else %}
+          <div class="w-20 h-20 rounded-3xl bg-gradient-to-br from-[#3B82F6] to-[#60A5FA] text-white text-3xl font-bold flex items-center justify-center shadow-card">
+            {{ current_user.nombre[0] | upper }}
+          </div>
+        {% endif %}
+
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400 mb-2">Panel personal</p>
+          <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-[#1F2937] dark:text-slate-100">Hola, {{ current_user.nombre }} 👋</h1>
+          <p class="text-sm md:text-base text-slate-500 dark:text-slate-400 mt-3 max-w-2xl">
+            {% if current_user.rol == 'medico' %}
+              Gestioná tu presencia profesional, revisá cómo se ve tu perfil y mantené tu información actualizada.
+            {% else %}
+              Explorá especialistas, guardá tu flujo de búsqueda y accedé rápido al directorio y al mapa.
+            {% endif %}
+          </p>
+        </div>
       </div>
+
       <div class="grid grid-cols-2 gap-3 min-w-[220px]">
         <div class="rounded-2xl bg-white/80 dark:bg-slate-900/70 border border-white/70 dark:border-slate-700 px-4 py-3">
           <p class="text-xs uppercase tracking-wide text-slate-400">Rol</p>
@@ -38,7 +51,13 @@
       <section class="bg-white rounded-3xl border border-gray-100/80 shadow-card p-6 md:p-7 md:col-span-2 xl:col-span-2 hover:shadow-lift transition-all duration-300">
         <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
           <div class="flex items-start gap-4">
-            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#F0F9FF] to-[#60A5FA] text-2xl flex items-center justify-center shadow-sm">👨‍⚕️</div>
+            {% if current_user.imagen_perfil %}
+              <img src="{{ url_for('static', filename='uploads/' ~ current_user.imagen_perfil) }}"
+                   alt="Foto del médico"
+                   class="w-14 h-14 rounded-2xl object-cover border border-gray-200 shadow-sm">
+            {% else %}
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#F0F9FF] to-[#60A5FA] text-2xl flex items-center justify-center shadow-sm">👨‍⚕️</div>
+            {% endif %}
             <div>
               <div class="flex flex-wrap items-center gap-2">
                 <h2 class="text-xl font-bold text-[#1F2937] dark:text-slate-100">Tu perfil médico</h2>

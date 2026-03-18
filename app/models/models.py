@@ -1,8 +1,3 @@
-# ============================================================
-#  HUGO — app/models/models.py
-#  Tu tarea: definir los modelos Usuario, Medico, Resena
-# ============================================================
-
 from app import bd, gestor_login
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -10,14 +5,11 @@ from datetime import datetime
 from sqlalchemy import UniqueConstraint
 
 
-# --- HUGO: user_loader ---
 @gestor_login.user_loader
 def cargar_usuario(usuario_id):
     return bd.session.get(Usuario, int(usuario_id))
 
-# ============================================================
-#  Modelo Usuario (tabla: usuarios)
-# ============================================================
+
 class Usuario(UserMixin, bd.Model):
     __tablename__ = "usuarios"
 
@@ -28,8 +20,8 @@ class Usuario(UserMixin, bd.Model):
     rol              = bd.Column(bd.String(20), default='paciente')
     email_verificado = bd.Column(bd.Boolean, default=False, nullable=False)
     creado_en        = bd.Column(bd.DateTime, default=datetime.utcnow)
+    imagen_perfil    = bd.Column(bd.String(255), nullable=True)
 
-    # Relaciones
     perfil_medico = bd.relationship("Medico", backref="usuario", uselist=False)
     resenas       = bd.relationship("Resena", backref="autor", lazy=True)
 
@@ -41,10 +33,8 @@ class Usuario(UserMixin, bd.Model):
 
     def __repr__(self):
         return f"<Usuario {self.correo}>"
-    
-# ============================================================
-#  Modelo Medico (tabla: medicos)
-# ============================================================
+
+
 class Medico(bd.Model):
     __tablename__ = "medicos"
 
@@ -64,27 +54,23 @@ class Medico(bd.Model):
     verificado             = bd.Column(bd.Boolean, default=False)
     creado_en              = bd.Column(bd.DateTime, default=datetime.utcnow)
 
-    # Ubicación
     latitud               = bd.Column(bd.Float, nullable=True)
     longitud              = bd.Column(bd.Float, nullable=True)
     direccion_consultorio = bd.Column(bd.String(255), nullable=True)
 
-    # Relaciones
     resenas = bd.relationship("Resena", backref="medico", lazy=True)
 
     def __repr__(self):
         return f"<Medico {self.especialidad} — matrícula {self.numero_matricula}>"
 
-# ============================================================
-#  Modelo Resena (tabla: resenas)
-# ============================================================
+
 class Resena(bd.Model):
     __tablename__ = "resenas"
 
     id         = bd.Column(bd.Integer, primary_key=True)
     medico_id  = bd.Column(bd.Integer, bd.ForeignKey("medicos.id"), nullable=False)
     usuario_id = bd.Column(bd.Integer, bd.ForeignKey("usuarios.id"), nullable=False)
-    puntuacion = bd.Column(bd.Integer, nullable=False)  # 1–5
+    puntuacion = bd.Column(bd.Integer, nullable=False)
     comentario = bd.Column(bd.Text, nullable=True)
     creado_en  = bd.Column(bd.DateTime, default=datetime.utcnow)
 

@@ -5,7 +5,6 @@
 
 <div class="max-w-3xl mx-auto px-4 md:px-8 py-10">
 
-  <!-- Breadcrumb -->
   <nav class="flex items-center gap-2 text-xs text-gray-400 font-medium mb-8">
     <a href="{{ url_for('principal.panel') }}" class="hover:text-[#3B82F6] transition-colors duration-150">Panel</a>
     <span class="text-gray-300">›</span>
@@ -22,9 +21,19 @@
         <p class="text-sm text-gray-500 mt-1">Completá tu información para aparecer en el directorio.</p>
       </div>
 
-      <form method="POST" action="{{ url_for('medicos.registrar') }}" class="space-y-10">
+      <form method="POST" action="{{ url_for('medicos.registrar') }}" enctype="multipart/form-data" class="space-y-10">
 
-        <!-- Section 1 -->
+        <div>
+          <p class="text-xs font-bold text-gray-300 uppercase tracking-widest mb-5">Foto de perfil</p>
+          <div class="space-y-1.5">
+            <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Imagen</label>
+            <input type="file" name="imagen_perfil" accept=".png,.jpg,.jpeg,.webp"
+                   class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                          focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent focus:bg-white
+                          hover:border-gray-300 transition-all duration-200">
+          </div>
+        </div>
+
         <div>
           <p class="text-xs font-bold text-gray-300 uppercase tracking-widest mb-5">Datos principales</p>
           <div class="grid md:grid-cols-2 gap-4">
@@ -68,7 +77,6 @@
           </div>
         </div>
 
-        <!-- Section 2 -->
         <div>
           <p class="text-xs font-bold text-gray-300 uppercase tracking-widest mb-5">Contacto & Experiencia</p>
           <div class="grid md:grid-cols-2 gap-4">
@@ -100,7 +108,6 @@
           </div>
         </div>
 
-        <!-- Section 3 -->
         <div>
           <p class="text-xs font-bold text-gray-300 uppercase tracking-widest mb-5">Presentación</p>
           <div class="space-y-1.5">
@@ -115,7 +122,6 @@
           </div>
         </div>
 
-        <!-- Submit -->
         <div class="flex items-center gap-3 pt-2 border-t border-gray-100">
           <button type="submit"
                   class="inline-flex items-center gap-2 bg-[#3B82F6] text-white font-semibold text-sm px-6 py-3 rounded-xl

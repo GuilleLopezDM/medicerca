@@ -17,11 +17,15 @@ def crear_app(config=None):
         "SECRET_KEY": os.getenv("SECRET_KEY", "dev-secret-key"),
         "SQLALCHEMY_DATABASE_URI": os.getenv("DATABASE_URL", "sqlite:///medicerca.db"),
         "SQLALCHEMY_TRACK_MODIFICATIONS": False,
+        "UPLOAD_FOLDER": os.path.join("app", "static", "uploads"),
+        "MAX_CONTENT_LENGTH": 4 * 1024 * 1024,  # 4 MB
     })
 
     # Overrides (tests, staging, etc.)
     if config:
         app.config.update(config)
+
+    os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
     bd.init_app(app)
     gestor_login.init_app(app)
