@@ -8,7 +8,6 @@
   <!-- ━━ HERO CARD ━━ -->
   <div class="bg-white rounded-2xl border border-gray-100/80 shadow-card overflow-hidden">
 
-    <!-- Top accent bar with gradient -->
     <div class="h-1 bg-gradient-to-r from-[#3B82F6] via-[#60A5FA] to-[#F0F9FF]"></div>
 
     <div class="p-6 md:p-8">
@@ -65,7 +64,7 @@
           {% if medico.latitud %}
           <a href="{{ url_for('mapa.mapa_medicos') }}#medico-{{ medico.id }}"
              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-medium text-sm
-                    hover:border-gray-300 hover:bg-gray-50 hover:scale-[1.02]
+                    hover:border-[#3B82F6] hover:text-[#3B82F6] hover:bg-[#F0F9FF] hover:scale-[1.02]
                     active:scale-[0.98] transition-all duration-200">
             🗺️ Ver en mapa
           </a>
@@ -180,7 +179,6 @@
 
     <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6">Reseñas de pacientes</h2>
 
-    <!-- Form -->
     {% if current_user.is_authenticated and current_user.id != medico.usuario_id %}
     <div class="bg-gray-50/70 rounded-xl border border-gray-100 p-5 mb-8">
       <p class="text-sm font-semibold text-[#1F2937] mb-4">Dejá tu reseña</p>
@@ -215,7 +213,6 @@
     </div>
     {% endif %}
 
-    <!-- List -->
     <div class="space-y-4">
       {% for resena in medico.resenas %}
       <div class="bg-white border border-gray-100 rounded-xl p-4 hover:border-gray-200 transition-colors duration-150">

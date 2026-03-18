@@ -11,7 +11,7 @@
       overflow: hidden;
       border: 1px solid #f1f5f9;
     }
-    .leaflet-popup-content { margin: 0 !important; width: 210px !important; }
+    .leaflet-popup-content { margin: 0 !important; width: 220px !important; }
     .leaflet-popup-tip-container { display: none; }
     .leaflet-control-zoom a {
       border-radius: 8px !important;
@@ -20,11 +20,41 @@
       font-weight: 600 !important;
     }
     .leaflet-control-zoom { border: none !important; box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important; }
+
+    #ruta-toast {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1001;
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.14);
+      padding: 11px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1F2937;
+      border: 1px solid #e5e7eb;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    #ruta-toast.oculto { display: none !important; }
+    #ruta-spinner {
+      width: 15px; height: 15px;
+      border: 2.5px solid #bfdbfe;
+      border-top-color: #3B82F6;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 {% endblock %}
 
 {% block contenido %}
-
 <div class="max-w-7xl mx-auto px-4 md:px-8 py-8">
 
   <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
@@ -39,115 +69,245 @@
     </a>
   </div>
 
-  <!-- Map wrapper -->
   <div class="relative rounded-2xl overflow-hidden shadow-card border border-gray-100/80">
     <div id="mapa" class="w-full" style="height: 78vh; min-height: 500px;"></div>
 
-    <!-- Loading state -->
+    <!-- Loading -->
     <div id="mapa-loading"
          class="absolute inset-0 bg-white/85 backdrop-blur-sm flex flex-col items-center justify-center gap-3 z-[1000] transition-opacity duration-300">
-      <div class="w-10 h-10 rounded-full border-3 border-[#3B82F6]/30 border-t-[#3B82F6] animate-spin"
-           style="border-width:3px"></div>
+      <div class="w-10 h-10 rounded-full border-[3px] border-[#3B82F6]/30 border-t-[#3B82F6] animate-spin"></div>
       <p class="text-sm font-medium text-gray-500">Cargando médicos...</p>
+    </div>
+
+    <!-- Toast ruta -->
+    <div id="ruta-toast" class="oculto">
+      <div id="ruta-spinner"></div>
+      <span id="ruta-msg">Calculando ruta...</span>
     </div>
   </div>
 
-  <!-- Legend -->
   <div class="mt-3 flex flex-wrap items-center gap-4 text-xs text-gray-400">
     <span class="flex items-center gap-1.5">
-      <span class="w-3 h-3 rounded-full bg-[#3B82F6] inline-block"></span>Médico registrado
+      <span class="w-3 h-3 rounded-full bg-[#3B82F6] inline-block"></span>Médico
     </span>
     <span class="flex items-center gap-1.5">
-      <span class="w-3 h-3 rounded-full bg-[#3B82F6] inline-block"></span>Verificado
+      <span class="w-3 h-3 rounded-full bg-[#10B981] inline-block"></span>Tu ubicación
     </span>
-    <span>· Clic en marcador para ver perfil</span>
+    <span>· Clic en marcador → "Trazar ruta" para ver el camino hasta el consultorio</span>
   </div>
 
 </div>
-
 {% endblock %}
 
 {% block pie_extra %}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-  const mapa = L.map('mapa', { zoomControl: false })
-    .setView([-23.4425, -58.4438], 7);
+(function () {
 
+  /* ── Mapa base ─────────────────────────────────────── */
+  const mapa = L.map('mapa', { zoomControl: false }).setView([-23.4425, -58.4438], 7);
   L.control.zoom({ position: 'bottomright' }).addTo(mapa);
-
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     maxZoom: 18,
   }).addTo(mapa);
 
-  // Custom marker factory
-  function makeIcon(verificado) {
-    const bg = verificado ? '#3B82F6' : '#3B82F6';
-    const border = verificado ? '#1F2937' : '#fff';
+  /* ── Íconos ────────────────────────────────────────── */
+  function mkIcon(color, borderColor) {
     return L.divIcon({
       className: '',
-      html: `<div style="width:32px;height:32px;background:${bg};border-radius:50% 50% 50% 0;
-                         transform:rotate(-45deg);border:2.5px solid ${border};
-                         box-shadow:0 3px 10px rgba(0,0,0,0.2);"></div>`,
-      iconSize: [32, 32],
-      iconAnchor: [16, 32],
-      popupAnchor: [0, -36],
+      html: `<div style="width:32px;height:32px;background:${color};border-radius:50% 50% 50% 0;
+                         transform:rotate(-45deg);border:2.5px solid ${borderColor};
+                         box-shadow:0 3px 10px rgba(0,0,0,0.22);"></div>`,
+      iconSize: [32, 32], iconAnchor: [16, 32], popupAnchor: [0, -36],
     });
   }
+  const iconMedico  = mkIcon('#3B82F6', '#fff');
+  const iconUsuario = mkIcon('#10B981', '#fff');
 
+  /* ── Estado ────────────────────────────────────────── */
+  let markerUsuario = null;
+  let lineaRuta     = null;
+  let todosLosMarkers = {}; // id → { marker, lat, lng }
+
+  /* ── Hash: #medico-31 ──────────────────────────────── */
+  const hashMatch = window.location.hash.match(/^#medico-(\d+)$/);
+  const targetId  = hashMatch ? parseInt(hashMatch[1]) : null;
+
+  /* ── Toast ─────────────────────────────────────────── */
+  const toast   = document.getElementById('ruta-toast');
+  const toastMsg= document.getElementById('ruta-msg');
+  const spinner = document.getElementById('ruta-spinner');
+  let toastTimer = null;
+
+  function showToast(msg, loading = true) {
+    clearTimeout(toastTimer);
+    toastMsg.textContent = msg;
+    spinner.style.display = loading ? 'block' : 'none';
+    toast.classList.remove('oculto');
+  }
+  function hideToast(ms = 0) {
+    toastTimer = setTimeout(() => toast.classList.add('oculto'), ms);
+  }
+
+  /* ── Ruta OSRM ─────────────────────────────────────── */
+  function trazarRuta(destLat, destLng) {
+    if (!navigator.geolocation) {
+      showToast('Tu navegador no soporta geolocalización', false);
+      hideToast(3500);
+      return;
+    }
+
+    showToast('Obteniendo tu ubicación...');
+
+    navigator.geolocation.getCurrentPosition(
+      function (pos) {
+        const uLat = pos.coords.latitude;
+        const uLng = pos.coords.longitude;
+
+        /* Marcador usuario */
+        if (markerUsuario) mapa.removeLayer(markerUsuario);
+        markerUsuario = L.marker([uLat, uLng], { icon: iconUsuario })
+          .addTo(mapa)
+          .bindPopup(
+            `<div style="font-family:Outfit,system-ui,sans-serif;padding:10px 14px;font-size:12px;font-weight:700;color:#1F2937;">
+               📍 Tu ubicación
+             </div>`
+          );
+
+        showToast('Calculando ruta...');
+
+        /* Quitar ruta anterior */
+        if (lineaRuta) { mapa.removeLayer(lineaRuta); lineaRuta = null; }
+
+        const osrmUrl =
+          `https://router.project-osrm.org/route/v1/driving/` +
+          `${uLng},${uLat};${destLng},${destLat}` +
+          `?overview=full&geometries=geojson`;
+
+        fetch(osrmUrl)
+          .then(r => r.json())
+          .then(data => {
+            if (!data.routes || !data.routes.length) {
+              showToast('No se encontró ruta disponible', false);
+              hideToast(3500);
+              return;
+            }
+
+            lineaRuta = L.geoJSON(data.routes[0].geometry, {
+              style: {
+                color: '#3B82F6',
+                weight: 5,
+                opacity: 0.85,
+                lineJoin: 'round',
+                lineCap: 'round',
+              }
+            }).addTo(mapa);
+
+            /* Ajustar vista */
+            mapa.fitBounds(lineaRuta.getBounds().pad(0.15));
+
+            const km   = (data.routes[0].distance / 1000).toFixed(1);
+            const mins = Math.round(data.routes[0].duration / 60);
+            showToast(`🚗 ${km} km · ~${mins} min en auto`, false);
+            hideToast(6000);
+          })
+          .catch(() => {
+            showToast('Error al conectar con el servicio de rutas', false);
+            hideToast(3500);
+          });
+      },
+      function (err) {
+        showToast('No se pudo obtener tu ubicación', false);
+        hideToast(3500);
+      },
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+    );
+  }
+
+  /* Exponemos globalmente para el botón dentro del popup */
+  window._trazarRuta = trazarRuta;
+
+  /* ── Cargar médicos ────────────────────────────────── */
   fetch('/mapa/medicos.json')
     .then(r => r.json())
-    .then(medicos => {
-      // Hide loading
+    .then(function (medicos) {
       const loader = document.getElementById('mapa-loading');
       loader.style.opacity = '0';
       setTimeout(() => loader.style.display = 'none', 300);
 
-      medicos.forEach(m => {
+      medicos.forEach(function (m) {
         const llenas = Math.round(m.calificacion_promedio || 0);
         const stars  = '★'.repeat(llenas) + '☆'.repeat(5 - llenas);
         const badge  = m.verificado
-          ? `<span style="display:inline-flex;align-items:center;gap:3px;background:#dcfce7;color:#166534;font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;border:1px solid #bbf7d0;">✓ Verificado</span>`
+          ? `<span style="display:inline-flex;align-items:center;gap:3px;background:#dcfce7;color:#166534;
+                          font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;
+                          border:1px solid #bbf7d0;">✓ Verificado</span>`
           : '';
 
-        const popup = `
+        const popupHtml = `
           <div style="font-family:Outfit,system-ui,sans-serif;">
             <div style="background:linear-gradient(135deg,#3B82F6,#60A5FA);padding:12px 14px 10px;">
-              <p style="font-weight:700;font-size:13px;color:#1F2937;margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${m.nombre}</p>
-              <p style="font-size:11px;color:#1e4080;font-weight:600;margin:0;">${m.especialidad}</p>
+              <p style="font-weight:700;font-size:13px;color:white;margin:0 0 2px;
+                        white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${m.nombre}</p>
+              <p style="font-size:11px;color:#dbeafe;font-weight:600;margin:0;">${m.especialidad}</p>
             </div>
             <div style="padding:11px 14px 14px;">
-              <p style="font-size:11px;color:#6b7280;margin:0 0 5px;">🏥 ${m.hospital}</p>
+              <p style="font-size:11px;color:#6b7280;margin:0 0 5px;">🏥 ${m.hospital || '—'}</p>
               <div style="display:flex;align-items:center;gap:5px;margin-bottom:8px;">
                 <span style="color:#f59e0b;font-size:11px;">${stars}</span>
                 <span style="font-size:10px;color:#9ca3af;">(${m.total_resenas})</span>
               </div>
               ${badge}
-              <a href="${m.url_perfil}" style="display:block;margin-top:10px;text-align:center;
-                 background:#3B82F6;color:white;font-size:11px;font-weight:700;
-                 padding:7px;border-radius:8px;text-decoration:none;
-                 letter-spacing:0.02em;"
+              <a href="${m.url_perfil}"
+                 style="display:block;margin-top:10px;text-align:center;background:#3B82F6;
+                        color:white;font-size:11px;font-weight:700;padding:7px;border-radius:8px;
+                        text-decoration:none;"
                  onmouseover="this.style.background='#1F2937'"
                  onmouseout="this.style.background='#3B82F6'">
                 Ver perfil →
               </a>
+              <button onclick="window._trazarRuta(${m.latitud}, ${m.longitud})"
+                      style="display:block;width:100%;margin-top:6px;text-align:center;
+                             background:#F0F9FF;color:#3B82F6;font-size:11px;font-weight:700;
+                             padding:7px;border-radius:8px;border:1px solid #bfdbfe;cursor:pointer;
+                             box-sizing:border-box;"
+                      onmouseover="this.style.background='#dbeafe'"
+                      onmouseout="this.style.background='#F0F9FF'">
+                🗺️ Trazar ruta desde mi ubicación
+              </button>
             </div>
           </div>`;
 
-        L.marker([m.latitud, m.longitud], { icon: makeIcon(m.verificado) })
+        const marker = L.marker([m.latitud, m.longitud], { icon: iconMedico })
           .addTo(mapa)
-          .bindPopup(popup, { maxWidth: 240 });
+          .bindPopup(popupHtml, { maxWidth: 260 });
+
+        todosLosMarkers[m.id] = { marker, lat: m.latitud, lng: m.longitud };
       });
 
+      /* ── Zoom + ruta automática si viene hash ───────── */
+      if (targetId && todosLosMarkers[targetId]) {
+        const { marker, lat, lng } = todosLosMarkers[targetId];
+        setTimeout(function () {
+          mapa.setView([lat, lng], 16, { animate: true });
+          marker.openPopup();
+          trazarRuta(lat, lng);
+        }, 500);
+      }
+
       if (!medicos.length) {
+        const loader = document.getElementById('mapa-loading');
         loader.innerHTML = '<p style="font-size:14px;color:#9ca3af;font-weight:500;">Sin médicos con ubicación registrada.</p>';
         loader.style.display = 'flex';
         loader.style.opacity = '1';
       }
     })
-    .catch(() => {
+    .catch(function () {
       const loader = document.getElementById('mapa-loading');
       loader.innerHTML = '<p style="font-size:14px;color:#ef4444;font-weight:500;">Error al cargar médicos.</p>';
     });
+
+})();
 </script>
 {% endblock %}
