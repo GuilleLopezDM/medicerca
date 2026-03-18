@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+{% block titulo %}Editar usuario completo — Admin{% endblock %}
+
+{% block cabecera_extra %}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+{% endblock %}
+
+{% block contenido %}
+
+<div class="max-w-5xl mx-auto px-4 md:px-8 py-10">
+
+  <!-- Breadcrumb -->
+  <nav class="flex items-center gap-2 text-xs text-gray-400 font-medium mb-8">
+    <a href="{{ url_for('admin.dashboard') }}" class="hover:text-[#3B82F6] transition-colors duration-150">Admin</a>
+    <span class="text-gray-300">›</span>
+    <a href="{{ url_for('admin.listar_usuarios') }}" class="hover:text-[#3B82F6] transition-colors duration-150">Usuarios</a>
+    <span class="text-gray-300">›</span>
+    <span class="text-gray-600">Editar completo</span>
+  </nav>
+
+  <div class="bg-white rounded-2xl border border-gray-100/80 shadow-card overflow-hidden">
+    <div class="h-0.5 bg-gradient-to-r from-red-500 to-red-600"></div>
+
+    <div class="p-6 md:p-8">
+
+      <div class="mb-8 pb-6 border-b border-gray-100">
+        <h1 class="text-xl font-bold tracking-tight text-[#1F2937]">Editar usuario completo</h1>
+        <p class="text-sm text-gray-500 mt-1">Editar {{ usuario.nombre }} ({{ usuario.rol }}) {% if medico %}y su perfil médico{% endif %}.</p>
+      </div>
+
+      <!-- ═══ FORM PRINCIPAL (sin forms anidados) ═══ -->
+      <form id="form-editar" method="POST" action="{{ url_for('admin.procesar_editar_completo_usuario', usuario_id=usuario.id) }}" class="space-y-10">
+
+        <!-- Section 1: Usuario -->
+        <div>
+          <p class="text-xs font-bold text-gray-300 uppercase tracking-widest mb-5">Datos del usuario</p>
+          <div class="grid md:grid-cols-2 gap-4">
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                Nombre <span class="text-red-400">*</span>
+              </label>
+              <input type="text" name="nombre" required value="{{ usuario.nombre }}"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                            focus:ring-2 focus:ring-red-500 focus:border-transparent focus:bg-white
+                            hover:border-gray-300 transition-all duration-200">
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                Correo electrónico <span class="text-red-400">*</span>
+              </label>
+              <input type="email" name="correo" required value="{{ usuario.correo }}"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                            focus:ring-2 focus:ring-red-500 focus:border-transparent focus:bg-white
+                            hover:border-gray-300 transition-all duration-200">
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Nueva contraseña (opcional)</label>
+              <input type="password" name="contrasena" placeholder="Dejar vacío para no cambiar"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                            focus:ring-2 focus:ring-red-500 focus:border-transparent focus:bg-white
+                            hover:border-gray-300 transition-all duration-200">
+            </div>
+
+            <!-- Rol: solo lectura para todos -->
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Rol</label>
+              <div class="px-4 py-3 border border-gray-100 bg-gray-50 rounded-xl text-sm flex items-center gap-2">
+                <span class="px-2 py-0.5 border rounded-lg text-xs font-semibold
+                             {% if usuario.rol == 'admin' %}bg-red-50 text-red-500 border-red-100
+                             {% elif usuario.rol == 'medico' %}bg-blue-50 text-[#3B82F6] border-blue-100
+                             {% else %}bg-green-50 text-green-600 border-green-100{% endif %}">
+                  {{ usuario.rol }}
+                </span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {% if medico %}
+        <!-- Section 2: Médico -->
+        <div>
+          <p class="text-xs font-bold text-gray-300 uppercase tracking-widest mb-5">Perfil médico</p>
+          <div class="grid md:grid-cols-2 gap-4">
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                Especialidad <span class="text-red-400">*</span>
+              </label>
+              <input type="text" name="especialidad" required value="{{ medico.especialidad }}"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                            focus:ring-2 focus:ring-red-500 focus:border-transparent focus:bg-white
+                            hover:border-gray-300 transition-all duration-200">
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                Número de matrícula <span class="text-red-400">*</span>
+              </label>
+              <input type="text" name="numero_matricula" required value="{{ medico.numero_matricula }}"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                            focus:ring-2 focus:ring-red-500 focus:border-transparent focus:bg-white
+                            hover:border-gray-300 transition-all duration-200">
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Hospital / Clínica</label>
+              <input type="text" name="hospital" value="{{ medico.hospital }}"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                            focus:ring-2 focus:ring-red-500 focus:border-transparent focus:bg-white
+                            hover:border-gray-300 transition-all duration-200">
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Ciudad</label>
+              <input type="text" name="ciudad" value="{{ medico.ciudad }}"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                            focus:ring-2 focus:ring-red-500 focus:border-transparent focus:bg-white
+                            hover:border-gray-300 transition-all duration-200">
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Teléfono</label>
+              <input type="text" name="telefono" value="{{ medico.telefono }}"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                            focus:ring-2 focus:ring-red-500 focus:border-transparent focus:bg-white
+                            hover:border-gray-300 transition-all duration-200">
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Años de experiencia</label>
+              <input type="number" name="anios_experiencia" min="0" value="{{ medico.anios_experiencia }}"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                            focus:ring-2 focus:ring-red-500 focus:border-transparent focus:bg-white
+                            hover:border-gray-300 transition-all duration-200">
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Universidad de graduación</label>
+              <input type="text" name="universidad_graduacion" value="{{ medico.universidad_graduacion }}"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                            focus:ring-2 focus:ring-red-500 focus:border-transparent focus:bg-white
+                            hover:border-gray-300 transition-all duration-200">
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Verificado</label>
+              <label class="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" name="verificado" {% if medico.verificado %}checked{% endif %}
+                       class="w-5 h-5 rounded border-gray-300 accent-red-500 focus:ring-red-500 cursor-pointer">
+                <span class="text-sm text-gray-700">Médico verificado</span>
+              </label>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Section 3: Ubicación -->
+        <div>
+          <p class="text-xs font-bold text-gray-300 uppercase tracking-widest mb-5">Ubicación</p>
+          <div class="grid md:grid-cols-2 gap-4 mb-4">
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Latitud</label>
+              <input type="number" step="any" id="latitud" name="latitud" value="{{ medico.latitud }}"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                            focus:ring-2 focus:ring-red-500 focus:border-transparent focus:bg-white
+                            hover:border-gray-300 transition-all duration-200">
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Longitud</label>
+              <input type="number" step="any" id="longitud" name="longitud" value="{{ medico.longitud }}"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                            focus:ring-2 focus:ring-red-500 focus:border-transparent focus:bg-white
+                            hover:border-gray-300 transition-all duration-200">
+            </div>
+
+            <div class="md:col-span-2 space-y-1.5">
+              <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Dirección del consultorio</label>
+              <input type="text" id="direccion_consultorio" name="direccion_consultorio" value="{{ medico.direccion_consultorio }}"
+                     class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                            focus:ring-2 focus:ring-red-500 focus:border-transparent focus:bg-white
+                            hover:border-gray-300 transition-all duration-200">
+            </div>
+
+          </div>
+          <div class="rounded-2xl overflow-hidden shadow-card border border-gray-100/80 mb-4">
+            <div id="mapa-selector" style="height: 300px; width: 100%;"></div>
+          </div>
+          <p class="text-xs text-gray-500">Hacé clic en el mapa para seleccionar la ubicación.</p>
+        </div>
+
+        <!-- Section 4: Biografía -->
+        <div>
+          <p class="text-xs font-bold text-gray-300 uppercase tracking-widest mb-5">Biografía</p>
+          <div class="space-y-1.5">
+            <textarea name="biografia" rows="3" placeholder="Describe su experiencia profesional..."
+                      class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm bg-gray-50/60 outline-none
+                             focus:ring-2 focus:ring-red-500 focus:border-transparent focus:bg-white
+                             hover:border-gray-300 transition-all duration-200 resize-none">{{ medico.biografia }}</textarea>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Actions -->
+        <div class="pt-6 border-t border-gray-100 flex flex-col sm:flex-row gap-3">
+          <button type="submit"
+                  class="flex-1 bg-red-500 text-white font-semibold text-sm py-3 px-6 rounded-xl
+                         hover:bg-red-600 hover:scale-[1.02] active:scale-[0.98]
+                         transition-all duration-200 shadow-sm">
+            💾 Guardar cambios
+          </button>
+          <a href="{{ url_for('admin.listar_usuarios') }}"
+             class="flex-1 bg-gray-100 text-gray-700 font-semibold text-sm py-3 px-6 rounded-xl text-center
+                    hover:bg-gray-200 transition-colors duration-200">
+            Cancelar
+          </a>
+        </div>
+
+      </form>
+      {# ═══ FIN FORM PRINCIPAL ═══ #}
+
+      {# ── Reseñas FUERA del form principal para evitar forms anidados ── #}
+      {% if resenas %}
+      <div class="mt-10 pt-8 border-t border-gray-100">
+        <p class="text-xs font-bold text-gray-300 uppercase tracking-widest mb-5">Reseñas ({{ resenas|length }})</p>
+        <div class="space-y-3">
+          {% for resena in resenas %}
+          <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="text-sm font-semibold text-gray-700">{{ resena.autor.nombre }}</span>
+                  <div class="flex items-center gap-1">
+                    {% for i in range(5) %}
+                      <span class="{% if i < resena.puntuacion %}text-yellow-400{% else %}text-gray-300{% endif %}">★</span>
+                    {% endfor %}
+                  </div>
+                  <span class="text-xs text-gray-500">{{ resena.creado_en.strftime('%d/%m/%Y') }}</span>
+                </div>
+                {% if resena.comentario %}
+                <p class="text-sm text-gray-700">{{ resena.comentario }}</p>
+                {% endif %}
+              </div>
+              {# Este form está FUERA del form principal — no hay anidamiento #}
+              <form method="POST" action="{{ url_for('admin.eliminar_resena_admin', resena_id=resena.id) }}"
+                    onsubmit="return confirm('¿Eliminar esta reseña?')" class="ml-4">
+                <button type="submit" class="text-red-500 hover:text-red-700 text-sm font-medium">
+                  ✕ Eliminar
+                </button>
+              </form>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block pie_extra %}
+{% if medico %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const mapa = L.map('mapa-selector', { zoomControl: true }).setView([-23.4425, -58.4438], 7);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).addTo(mapa);
+
+  const pinIcon = L.divIcon({
+    className: '',
+    html: `<div style="width:30px;height:30px;background:#ef4444;border-radius:50% 50% 50% 0;
+                       transform:rotate(-45deg);border:2.5px solid #ef4444;
+                       box-shadow:0 4px 12px rgba(0,0,0,0.25);"></div>`,
+    iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -32],
+  });
+
+  let marcador = null;
+
+  function activar(lat, lng, geocode) {
+    document.getElementById('latitud').value = lat.toFixed(6);
+    document.getElementById('longitud').value = lng.toFixed(6);
+    if (geocode) {
+      document.getElementById('direccion_consultorio').value = geocode;
+    }
+  }
+
+  mapa.on('click', function(e) {
+    const { lat, lng } = e.latlng;
+    if (marcador) mapa.removeLayer(marcador);
+    marcador = L.marker([lat, lng], { icon: pinIcon }).addTo(mapa);
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+      .then(r => r.json())
+      .then(data => activar(lat, lng, data.display_name || ''))
+      .catch(() => activar(lat, lng, ''));
+  });
+
+  {% if medico.latitud and medico.longitud %}
+    marcador = L.marker([{{ medico.latitud }}, {{ medico.longitud }}], { icon: pinIcon }).addTo(mapa);
+    mapa.setView([{{ medico.latitud }}, {{ medico.longitud }}], 15);
+  {% endif %}
+</script>
+{% endif %}
+{% endblock %}
