@@ -1,5 +1,7 @@
 # 🩺 MediCerca — Directorio Médico Interactivo
 
+🇬🇧 [English version](README.en.md)
+
 [![Tests](https://github.com/GuilleLopezDM/medicerca/actions/workflows/tests.yml/badge.svg)](https://github.com/GuilleLopezDM/medicerca/actions/workflows/tests.yml)
 
 > Hackathon 2025 · Python + Flask + SQLite + Tailwind CSS + Leaflet.js
