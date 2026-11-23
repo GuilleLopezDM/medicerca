@@ -1,5 +1,7 @@
 # 🩺 MediCerca — Directorio Médico Interactivo
 
+[![Tests](https://github.com/GuilleLopezDM/medicerca/actions/workflows/tests.yml/badge.svg)](https://github.com/GuilleLopezDM/medicerca/actions/workflows/tests.yml)
+
 > Hackathon 2025 · Python + Flask + SQLite + Tailwind CSS + Leaflet.js
 
 **MediCerca** es una plataforma web para encontrar médicos profesionales en Paraguay. Permite buscar por especialidad y ciudad, ver el consultorio en un mapa interactivo y leer reseñas de otros pacientes.
@@ -27,7 +29,8 @@ Base datos: SQLite (Flask-SQLAlchemy)
 Auth:       Flask-Login + Werkzeug
 Frontend:   Jinja2 + Tailwind CSS (CDN)
 Mapa:       Leaflet.js + OpenStreetMap (sin API key)
-Testing:    pytest
+Testing:    pytest + GitHub Actions
+Docker:     python:3.11-slim + gunicorn
 ```
 
 ---
@@ -64,14 +67,26 @@ Abrir → **http://127.0.0.1:5000**
 
 ## 👤 Usuarios de prueba
 
+`python seeds.py` crea 10 médicos (con 3 reseñas cada uno) y 10 pacientes. Algunos ejemplos:
+
 | Correo | Contraseña | Rol |
 |---|---|---|
-| `carlos@medicerca.com` | `test1234` | Médico — Cardiología |
-| `laura@medicerca.com` | `test1234` | Médico — Pediatría |
-| `roberto@medicerca.com` | `test1234` | Médico — Dermatología |
-| `ana@medicerca.com` | `test1234` | Médico — Neurología |
-| `miguel@medicerca.com` | `test1234` | Médico — Traumatología |
-| `paciente1@test.com` | `test1234` | Paciente |
+| `carlos.benitez@medicerca.com` | `medico1234` | Médico — Cardiología |
+| `maria.ramirez@medicerca.com` | `medico1234` | Médico — Pediatría |
+| `ana.gonzalez@medicerca.com` | `medico1234` | Médico — Dermatología |
+| `juan.rios@gmail.com` | `paciente1234` | Paciente |
+| `claudia.sanchez@gmail.com` | `paciente1234` | Paciente |
+
+---
+
+## 🐳 Docker
+
+```bash
+docker build -t medicerca .
+docker run -p 5000:5000 medicerca
+```
+
+Al arrancar, el contenedor carga los datos de prueba y sirve la app con gunicorn en **http://localhost:5000**.
 
 ---
 
@@ -98,7 +113,8 @@ medicerca/
 │   └── static/                   # CSS y JS personalizados
 │
 └── tests/
-    └── test_rutas.py             # 8 tests con pytest
+    ├── conftest.py               # Fixtures: app y cliente de prueba
+    └── test_*.py                 # 20 tests con pytest
 ```
 
 ---
@@ -106,20 +122,10 @@ medicerca/
 ## 🧪 Tests
 
 ```bash
-pip install pytest
-pytest tests/ -v
+pytest -v
 ```
 
-```
-tests/test_rutas.py::test_inicio              PASSED
-tests/test_rutas.py::test_pagina_login        PASSED
-tests/test_rutas.py::test_pagina_registro     PASSED
-tests/test_rutas.py::test_lista_medicos       PASSED
-tests/test_rutas.py::test_mapa                PASSED
-tests/test_rutas.py::test_api_mapa_json       PASSED
-tests/test_rutas.py::test_registrar_usuario   PASSED
-tests/test_rutas.py::test_medico_no_existe    PASSED
-```
+La suite (20 tests: autenticación, rutas públicas, registro y médicos) corre en una base SQLite en memoria. GitHub Actions la ejecuta en cada push y pull request, y además verifica que la imagen de Docker se construya.
 
 ---
 
