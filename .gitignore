@@ -34,4 +34,5 @@ instance/
 Thumbs.db
 
 # Uploads
-app/static/img/uploads/
+app/static/uploads/*
+!app/static/uploads/.gitkeep
